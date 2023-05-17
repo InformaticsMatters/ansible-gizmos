@@ -1,5 +1,7 @@
 # Ansible Gizmos
 
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/InformaticsMatters/ansible-gizmos)
+
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Packaged with Poetry](https://img.shields.io/badge/packaging-poetry-cyan.svg)](https://python-poetry.org/)

@@ -20,6 +20,8 @@ jobs:
   lint:
 
     runs-on: ubuntu-latest
+    env:
+      KUBECONFIG: dummy.config
     steps:
     - name: Checkout
       uses: actions/checkout@v2
