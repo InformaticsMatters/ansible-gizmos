@@ -33,6 +33,17 @@
     - databases
     login_host: "127.0.0.1"
   register: postgresql_info
+  when: not ansible_check_mode
+
+- name: Set database discovered (check mode)
+  set_fact:
+    database_discovered: yes
+  when: ansible_check_mode
+
+- name: Set database discovered (check mode)
+  set_fact:
+    database_discovered: "{{ kdd_db_database in postgresql_info.databases }}"
+  when: not ansible_check_mode
 
 - name: Set dump file
   set_fact:
@@ -59,7 +70,7 @@
     set_fact:
       success: yes
 
-  when: kdd_db_database in postgresql_info.databases
+  when: database_discovered
 
 - name: Unknown database
   block:
@@ -70,7 +81,7 @@
     debug:
       msg: "Unknown database '{{ kdd_db_database }}'"
 
-  when: kdd_db_database not in postgresql_info.databases
+  when: not database_discovered
 
 # Always kill the async command
 
@@ -97,4 +108,4 @@
   debug:
     msg:
     - The '{{ kdd_db_database }}' database has been dumped to '{{ dump_file }}'
-    - Size {{ dump_file_stat.stat.size }} bytes
+    - Size {{ ansible_check_mode | ternary(0, dump_file_stat.stat.size) }} bytes

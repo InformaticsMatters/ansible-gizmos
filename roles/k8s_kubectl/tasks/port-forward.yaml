@@ -37,7 +37,7 @@
 
 - name: Run kubectl port-forward
   command: "{{ cmd }}"
-  async: "{{ kc_port_forward_time_seconds | int }}"
+  async: "{{ ansible_check_mode | ternary(0, kc_port_forward_time_seconds) }}"
   poll: 0
   changed_when: no
   register: port_forward
@@ -57,6 +57,7 @@
   assert:
     that: kubectl_process.stdout is regex("^[0-9]+$")
     fail_msg: kubectl PID is not a number
+  when: not ansible_check_mode
 
 - name: Give kubectl a few seconds to get ready
   pause:

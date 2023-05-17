@@ -24,19 +24,20 @@
 - name: Stat the restore file
   stat:
     path: "{{ restore_file }}"
-  register: dump_file_stat
+  register: restore_file_stat
 
 - name: Assert the restore file exists
   assert:
     that:
-    - dump_file_stat.stat.exists
+    - restore_file_stat.stat.exists
     fail_msg: "The restore file '{{ restore_file }}' does not exist"
+  when: not ansible_check_mode
 
 - name: Display restore destination
   debug:
     msg:
     - Restoring database '{{ kdr_db_database }}' from '{{ restore_file }}'
-    - Size {{ dump_file_stat.stat.size }} bytes
+    - Size {{ ansible_check_mode | ternary(0, restore_file_stat.stat.size) }} bytes
     - Using kubeconfig '{{ kdr_db_kubeconfig }}'
     - To Namespace '{{ kdr_db_namespace }}'
     - And Pod '{{ kdr_db_pod }}'
@@ -47,11 +48,13 @@
       Are you sure you want to restore from this file?
       Type 'YES' to continue
   register: pause_result
+  when: not ansible_check_mode
 
 - name: Assert confirmation
   assert:
     that: pause_result.user_input == 'YES'
     fail_msg: "Stopping - you did not type YES"
+  when: not ansible_check_mode
 
 # Use kubectl to port-forward to the database pod.
 # We also get the process ID so we can use that to kill it when we're done.
@@ -74,6 +77,7 @@
   community.postgresql.postgresql_db:
     name: "{{ kdr_db_database }}"
     login_host: "127.0.0.1"
+  when: not ansible_check_mode
 
 - name: Create User
   block:
@@ -101,6 +105,7 @@
     state: restore
     target: "{{ restore_file }}"
     login_host: "127.0.0.1"
+  when: not ansible_check_mode
 
 # Always kill the async command
 
