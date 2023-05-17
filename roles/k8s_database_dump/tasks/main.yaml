@@ -36,7 +36,7 @@
 
 - name: Set dump file
   set_fact:
-    dump_file: "{{ kdd_db_dump_directory }}/{{ kdd_db_database }}.sql"
+    dump_file: "{{ kdd_db_dump_directory }}/{{ kdd_db_file_basename }}.sql{{ kdd_db_file_compression }}"
 
 - name: Set success (assume failure)
   set_fact:

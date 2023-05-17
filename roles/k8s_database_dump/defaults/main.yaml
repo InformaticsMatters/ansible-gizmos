@@ -8,8 +8,13 @@ kdd_db_kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
 
 # Some with defaults...
 
+kdd_db_file_basename: "backup"
 kdd_db_pod: "database-0"
 kdd_db_pod_port: "5432"
+# Compression.
+# Empty (none) or one of ".pgc", ".bz2", ".gz" or ".xz"
+# See the Ansible postgresql_db module.
+kdd_db_file_compression: ""
 
 # Dump's 'extra-args' parameter,
 # See the Ansible postgresql_db module.

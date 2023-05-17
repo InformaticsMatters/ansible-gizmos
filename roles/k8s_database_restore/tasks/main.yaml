@@ -12,7 +12,7 @@
 
 - name: Set restore file
   set_fact:
-    restore_file: "{{ kdr_db_restore_directory }}/{{ kdr_db_database }}.sql"
+    restore_file: "{{ kdr_db_restore_directory }}/{{ kdr_db_file_basename }}.sql{{ kdr_db_file_compression }}"
 
 - name: Stat the restore file
   stat:

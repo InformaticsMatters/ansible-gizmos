@@ -8,9 +8,13 @@ kdr_db_kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
 
 # Some with defaults...
 
+kdr_db_file_basename: "backup"
 kdr_db_pod: "database-0"
 kdr_db_pod_port: "5432"
-
+# Compression.
+# Empty (none) or one of ".pgc", ".bz2", ".gz" or ".xz"
+# See the Ansible postgresql_db module.
+kdr_db_file_compression: ""
 
 # The local port to forward to the database pod
 kdr_db_local_port: "5432"
