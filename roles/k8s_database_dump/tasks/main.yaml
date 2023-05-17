@@ -5,10 +5,10 @@
 - name: Check variables
   assert:
     that:
-    - db_kubeconfig | string | length > 0
-    - db_namespace | string | length > 0
-    - db_database | string | length > 0
-    - db_local_port | string | length > 0
+    - kdd_db_kubeconfig | string | length > 0
+    - kdd_db_namespace | string | length > 0
+    - kdd_db_database | string | length > 0
+    - kdd_db_local_port | string | length > 0
 
 # Use kubectl to port-forward to the database pod.
 # We also get the process ID so we can use that to kill it when we're done.
@@ -18,12 +18,12 @@
     name: k8s_kubectl
     tasks_from: port-forward.yaml
   vars:
-    kc_kubeconfig: "{{ db_kubeconfig }}"
-    kc_namespace: "{{ db_namespace }}"
-    kc_pod: "{{ db_pod }}"
-    kc_local_port: "{{ db_local_port }}"
-    kc_pod_port: "{{ db_pod_port }}"
-    kc_port_forward_time_seconds: "{{ db_port_forward_time_seconds }}"
+    kc_kubeconfig: "{{ kdd_db_kubeconfig }}"
+    kc_namespace: "{{ kdd_db_namespace }}"
+    kc_pod: "{{ kdd_db_pod }}"
+    kc_local_port: "{{ kdd_db_local_port }}"
+    kc_pod_port: "{{ kdd_db_pod_port }}"
+    kc_port_forward_time_seconds: "{{ kdd_db_port_forward_time_seconds }}"
 
 # Does the chosen database exist?
 
@@ -36,7 +36,7 @@
 
 - name: Set dump file
   set_fact:
-    dump_file: "{{ db_dump_directory }}/{{ db_database }}.sql.gz"
+    dump_file: "{{ kdd_db_dump_directory }}/{{ kdd_db_database }}.sql.gz"
 
 - name: Set success (assume failure)
   set_fact:
@@ -47,9 +47,9 @@
 
   # Dump the known chosen database
 
-  - name: Dumping database ({{ db_database }}) -> {{ dump_file }}
+  - name: Dumping database ({{ kdd_db_database }}) -> {{ dump_file }}
     community.postgresql.postgresql_db:
-      name: "{{ db_database }}"
+      name: "{{ kdd_db_database }}"
       state: dump
       target: "{{ dump_file }}"
       login_host: "127.0.0.1"
@@ -58,7 +58,7 @@
     set_fact:
       success: yes
 
-  when: db_database in postgresql_info.databases
+  when: kdd_db_database in postgresql_info.databases
 
 - name: Unknown database
   block:
@@ -67,9 +67,9 @@
 
   - name: Unknown database
     debug:
-      msg: "Unknown database '{{ db_database }}'"
+      msg: "Unknown database '{{ kdd_db_database }}'"
 
-  when: db_database not in postgresql_info.databases
+  when: kdd_db_database not in postgresql_info.databases
 
 # Always kill the async command
 
@@ -85,15 +85,15 @@
 - name: Assert success
   assert:
     that: success
-    fail_msg: "Dump of the '{{ db_database }}' database failed"
+    fail_msg: "Dump of the '{{ kdd_db_database }}' database failed"
 
 - name: Stat the written file
   stat:
     path: "{{ dump_file }}"
   register: dump_file_stat
 
-- name: Display dump file
+- name: Display summary
   debug:
     msg:
-    - The '{{ db_database }}' database has been dumped to '{{ dump_file }}'
+    - The '{{ kdd_db_database }}' database has been dumped to '{{ dump_file }}'
     - Size {{ dump_file_stat.stat.size }} bytes

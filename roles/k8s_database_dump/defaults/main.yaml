@@ -2,23 +2,23 @@
 
 # Some required variables...
 
-db_namespace: ""
-db_database: ""
-db_kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
+kdd_db_namespace: ""
+kdd_db_database: ""
+kdd_db_kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
 
 # Some with defaults...
 
-db_pod: "database-0"
-db_pod_port: "5432"
+kdd_db_pod: "database-0"
+kdd_db_pod_port: "5432"
 
 # The local port to forward to the database pod
-db_local_port: "5432"
+kdd_db_local_port: "5432"
 # The local directory where you want the dump to be written.
-# The file is the database name with a .sql.gz extension.
-db_dump_directory: /tmp
+# The file uses the database name with a .sql.gz extension.
+kdd_db_dump_directory: /tmp
 
 # Maximum length of time to allow the dump to run.
 # kubectl is run asynchronously and then killed so the timeout is
 # simply a protection mechanism. Set it to something much higher
 # than you expect the dump to take.
-db_port_forward_time_seconds: 300
+kdd_db_port_forward_time_seconds: 300

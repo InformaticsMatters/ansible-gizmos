@@ -2,6 +2,7 @@
 
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![Packaged with Poetry](https://img.shields.io/badge/packaging-poetry-cyan.svg)](https://python-poetry.org/)
 
 [![lint](https://github.com/InformaticsMatters/ansible-gizmos/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/InformaticsMatters/ansible-gizmos/actions/workflows/lint.yaml)
 
@@ -9,14 +10,15 @@ Generally useful Ansible playbooks (and roles), designed to run on localhost
 (without an inventory), that don't fit in any other project. The outer project is
 managed by Poetry.
 
-Each *gizmo* is implemented in an Ansible Role and has a supporting root-level
-playbook, named after the role, e.g. `site-k8s-database-dump.yaml`.
+Each **gizmo** is implemented in an Ansible Role and has a supporting project-root-level
+playbook/site-file, named after the role, e.g. `site-k8s-database-dump.yaml`.
 
+## Getting started
 Prerequisites: -
 
 1.  [Poetry]
 
-Some *gizmos* may have additional prerequisites.
+Some **gizmos** may have additional prerequisites.
 If they do the playbook should assert they are satisfied or make the prerequisite clear.
 
 To get started, use the Poetry shell (environment): -
