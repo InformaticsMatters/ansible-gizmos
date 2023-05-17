@@ -77,7 +77,7 @@
 
 - name: Create User
   block:
-  
+
   - name: Create user {{ kdr_db_user }}
     community.postgresql.postgresql_user:
       name: "{{ kdr_db_user }}"
