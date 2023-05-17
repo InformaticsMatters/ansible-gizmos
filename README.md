@@ -23,17 +23,17 @@ If they do the playbook should assert they are satisfied or make the prerequisit
 
 To get started, use the Poetry shell (environment): -
 
-    $ poetry shell
-    $ poetry install
+    poetry shell
+    poetry install
 
 And from here you can run a playbook: -
 
-    $ ansible-playbook site-k8s-database-dump.yaml
+    ansible-playbook site-k8s-database-dump.yaml
 
 And use a `parameters.yaml` file if you need to,
 which is protected from git with our `.gitignore` file: -
 
-    $ ansible-playbook site-k8s-database-dump.yaml -e @parameters.yaml
+    ansible-playbook site-k8s-database-dump.yaml -e @parameters.yaml
 
 ## Contributing
 The project uses: -
