@@ -20,6 +20,8 @@ jobs:
   lint:
 
     runs-on: ubuntu-latest
+    env:
+      KUBECONFIG: dummy.config
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -44,11 +46,9 @@ jobs:
       run: poetry install --no-interaction --no-root
     - name: Pre-commit check
       run: |
-        source .venv/bin/activate
         pre-commit run --all-files
     - name: Lint
       run: |
-        source .venv/bin/activate
         yamllint .
         find . -type f -name '*.yaml.j2' -exec yamllint {} +
         ansible-lint
