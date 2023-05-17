@@ -30,6 +30,7 @@
     msg:
     - Restoring database '{{ kdr_db_database }}' from '{{ restore_file }}'
     - Size {{ dump_file_stat.stat.size }} bytes
+    - Using kubeconfig '{{ kdr_db_kubeconfig }}'
     - To Namespace '{{ kdr_db_namespace }}'
     - And Pod '{{ kdr_db_pod }}'
 
@@ -62,6 +63,11 @@
 
 # Restore the database
 
+- name: Create database ({{ kdr_db_database }})
+  community.postgresql.postgresql_db:
+    name: "{{ kdr_db_database }}"
+    login_host: "127.0.0.1"
+
 - name: Restoring database ({{ kdr_db_database }}) <- {{ restore_file }}
   community.postgresql.postgresql_db:
     name: "{{ kdr_db_database }}"
@@ -84,5 +90,6 @@
   debug:
     msg:
     - The '{{ kdr_db_database }}' database has been restored
+    - Using kubeconfig '{{ kdr_db_kubeconfig }}'
     - Restored to namespace '{{ kdr_db_namespace }}'
     - And Pod '{{ kdr_db_pod }}'
