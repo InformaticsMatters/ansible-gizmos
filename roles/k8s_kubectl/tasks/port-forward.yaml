@@ -1,0 +1,68 @@
+---
+
+# Runs kubectl port-forward asynchronously.
+#
+# Returns: -
+# - k8s_kubectl_pid - the the process ID
+# - k8s_kubectl_cmd - the command that was run
+
+- name: Check variables
+  assert:
+    that:
+    - kc_kubeconfig is defined
+    - kc_pod is defined
+    - kc_local_port is defined
+    - kc_pod_port is defined
+    - kc_port_forward_time_seconds is defined
+
+- include_tasks: _check-kubeconfig.yaml
+- include_tasks: _check-kubectl.yaml
+
+# Set the command to run kubectl port-forward
+
+- name: Set command
+  set_fact:
+    cmd: >-
+      kubectl port-forward
+      --kubeconfig={{ kc_kubeconfig | expanduser }}
+      -n {{ kc_namespace }}
+      {{ kc_pod }} {{ kc_local_port }}:{{ kc_pod_port }}
+
+- name: Display command
+  debug:
+    msg: "{{ cmd }}"
+
+# Use kubectl to port-forward to the database pod.
+# We also get the process ID so we can kill it when we're done.
+
+- name: Run kubectl port-forward
+  command: "{{ cmd }}"
+  async: "{{ kc_port_forward_time_seconds | int }}"
+  poll: 0
+  changed_when: no
+  register: port_forward
+
+- name: Get kubectl PID
+  shell: >
+    set -o pipefail && \
+    ps -ef | grep '{{ cmd }}' | grep -v grep | awk '{print $2}'
+  changed_when: no
+  register: kubectl_process
+
+- name: Display kubectl PID
+  debug:
+    msg: kubectl pid={{ kubectl_process.stdout }}
+
+- name: Ensure that kubectl PID is a whole positive number
+  assert:
+    that: kubectl_process.stdout is regex("^[0-9]+$")
+    fail_msg: kubectl PID is not a number
+
+- name: Give kubectl a few seconds to get ready
+  pause:
+    seconds: 2
+
+- name: Set return variables
+  set_fact:
+    k8s_kubectl_pid: "{{ kubectl_process.stdout }}"
+    k8s_kubectl_cmd: "{{ cmd }}"

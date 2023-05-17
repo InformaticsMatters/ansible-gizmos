@@ -1,0 +1,33 @@
+---
+
+# Kills a process (expected to be a kubectl process)
+
+- name: Check variables
+  assert:
+    that:
+    - kc_pid is defined
+
+# Stop kubectl
+
+- name: Display PID
+  debug:
+    msg: "PID={{ kc_pid }}"
+
+- name: Kill kubectl
+  command: kill {{ item }}
+  changed_when: no
+  with_items: "{{ kc_pid }}"
+
+- name: Wait for kubectl to stop
+  wait_for:
+    path: /proc/{{ item }}/status
+    state: absent
+  with_items: "{{ kubectl_process.stdout_lines }}"
+  ignore_errors: true
+  register: killed_processes
+
+- name: Force kill stuck kubectl
+  command: kill -9 {{ item }}
+  register: kill_output
+  changed_when: kill_output.rc != 0
+  with_items: "{{ killed_processes.results | select('failed') | map(attribute='item') | list }}"

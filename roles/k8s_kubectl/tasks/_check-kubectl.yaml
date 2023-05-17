@@ -1,0 +1,23 @@
+---
+
+# Makes sure the 'kubectl' command exists
+
+- name: Find kubectl
+  command: which kubectl
+  changed_when: no
+  register: kubectl_check
+
+- name: Assert kubectl is installed
+  fail:
+    msg: "kubectl cannot be found"
+  when: kubectl_check.rc != 0
+
+- name: Get existing kubectl process
+  shell: ps -ef | grep kubectl | grep -v grep | awk '{print $2}'
+  changed_when: no
+  register: kubectl_process
+
+- name: Assert no existing kubectl process
+  assert:
+    that: kubectl_process.stdout | length == 0
+    fail_msg: "An existing kubectl is running (PID={{ kubectl_process.stdout }})"

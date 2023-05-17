@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "ansible-gizmos"
+version = "0.1.0"
+description = "Ansible playbooks/roles that don't fit anywhere else"
+authors = ["Alan Christie <achristie@informaticsmatters.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.10.*"
+ansible = "7.5.0"
+psycopg2 = "2.9.6"
+
+[tool.poetry.group.dev.dependencies]
+ansible-lint = "5.*"
+pre-commit = "3.3.*"
+yamllint = "1.*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

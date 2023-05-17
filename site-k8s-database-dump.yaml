@@ -1,0 +1,9 @@
+---
+
+# Dump a database using kubectl to port-forward to a database Pod
+# hosted on a cluster. Requires a suitable 'kubectl' utility.
+
+- hosts: localhost
+  gather_facts: no
+  roles:
+  - k8s_database_dump
