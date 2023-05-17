@@ -1,0 +1,88 @@
+---
+
+# Check initial conditions
+
+- name: Check variables
+  assert:
+    that:
+    - kdr_db_kubeconfig | string | length > 0
+    - kdr_db_namespace | string | length > 0
+    - kdr_db_database | string | length > 0
+    - kdr_db_local_port | string | length > 0
+
+- name: Set restore file
+  set_fact:
+    restore_file: "{{ kdr_db_restore_directory }}/{{ kdr_db_database }}.sql"
+
+- name: Stat the restore file
+  stat:
+    path: "{{ restore_file }}"
+  register: dump_file_stat
+
+- name: Assert the restore file exists
+  assert:
+    that:
+    - dump_file_stat.stat.exists
+    fail_msg: "The restore file '{{ restore_file }}' does not exist"
+
+- name: Display restore destination
+  debug:
+    msg:
+    - Restoring database '{{ kdr_db_database }}' from '{{ restore_file }}'
+    - Size {{ dump_file_stat.stat.size }} bytes
+    - To Namespace '{{ kdr_db_namespace }}'
+    - And Pod '{{ kdr_db_pod }}'
+
+- name: A cautionary reminder before we restore
+  pause:
+    prompt: >
+      Are you sure you want to restore from this file?
+      Type 'YES' to continue
+  register: pause_result
+
+- name: Assert confirmation
+  assert:
+    that: pause_result.user_input == 'YES'
+    fail_msg: "Stopping - you did not type YES"
+
+# Use kubectl to port-forward to the database pod.
+# We also get the process ID so we can use that to kill it when we're done.
+
+- name: Run kubectl port-forward
+  include_role:
+    name: k8s_kubectl
+    tasks_from: port-forward.yaml
+  vars:
+    kc_kubeconfig: "{{ kdr_db_kubeconfig }}"
+    kc_namespace: "{{ kdr_db_namespace }}"
+    kc_pod: "{{ kdr_db_pod }}"
+    kc_local_port: "{{ kdr_db_local_port }}"
+    kc_pod_port: "{{ kdr_db_pod_port }}"
+    kc_port_forward_time_seconds: "{{ kdr_db_port_forward_time_minutes | int * 60 }}"
+
+# Restore the database
+
+- name: Restoring database ({{ kdr_db_database }}) <- {{ restore_file }}
+  community.postgresql.postgresql_db:
+    name: "{{ kdr_db_database }}"
+    state: restore
+    target: "{{ restore_file }}"
+    login_host: "127.0.0.1"
+
+# Always kill the async command
+
+- name: Kill kubectl command
+  include_role:
+    name: k8s_kubectl
+    tasks_from: kill.yaml
+  vars:
+    kc_pid: "{{ k8s_kubectl_pid }}"
+
+# Report success or failure
+
+- name: Display summary
+  debug:
+    msg:
+    - The '{{ kdr_db_database }}' database has been restored
+    - Restored to namespace '{{ kdr_db_namespace }}'
+    - And Pod '{{ kdr_db_pod }}'

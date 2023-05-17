@@ -2,26 +2,24 @@
 
 # Some required variables...
 
-kdd_db_namespace: ""
-kdd_db_database: ""
-kdd_db_kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
+kdr_db_namespace: ""
+kdr_db_database: ""
+kdr_db_kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
 
 # Some with defaults...
 
-kdd_db_pod: "database-0"
-kdd_db_pod_port: "5432"
+kdr_db_pod: "database-0"
+kdr_db_pod_port: "5432"
 
-# Dump's 'extra-args' parameter,
-# See the Ansible postgresql_db module.
-kdd_db_dump_extra_args: "--clean"
+
 # The local port to forward to the database pod
-kdd_db_local_port: "5432"
-# The local directory where you want the dump to be written.
+kdr_db_local_port: "5432"
+# The local directory where you want the restore to be read from.
 # The file uses the database name with a .sql.gz extension.
-kdd_db_dump_directory: /tmp
+kdr_db_restore_directory: /tmp
 
 # Maximum length of time to allow an asynchronous kubectl to run.
 # kubectl is run asynchronously and then killed by playbooks and roles.
 # The timeout is simply a protection mechanism.
 # Set it to something much higher than you expect the process to take.
-kdd_db_port_forward_time_minutes: 60
+kdr_db_port_forward_time_minutes: 60

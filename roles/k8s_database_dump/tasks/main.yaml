@@ -23,7 +23,7 @@
     kc_pod: "{{ kdd_db_pod }}"
     kc_local_port: "{{ kdd_db_local_port }}"
     kc_pod_port: "{{ kdd_db_pod_port }}"
-    kc_port_forward_time_seconds: "{{ kdd_db_port_forward_time_seconds }}"
+    kc_port_forward_time_seconds: "{{ kdd_db_port_forward_time_minutes | int * 60 }}"
 
 # Does the chosen database exist?
 
@@ -36,7 +36,7 @@
 
 - name: Set dump file
   set_fact:
-    dump_file: "{{ kdd_db_dump_directory }}/{{ kdd_db_database }}.sql.gz"
+    dump_file: "{{ kdd_db_dump_directory }}/{{ kdd_db_database }}.sql"
 
 - name: Set success (assume failure)
   set_fact:
@@ -53,6 +53,7 @@
       state: dump
       target: "{{ dump_file }}"
       login_host: "127.0.0.1"
+      dump_extra_args: "{{ kdd_db_dump_extra_args }}"
 
   - name: Set success
     set_fact:

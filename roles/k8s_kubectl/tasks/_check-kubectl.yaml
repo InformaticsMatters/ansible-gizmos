@@ -20,4 +20,4 @@
 - name: Assert no existing kubectl process
   assert:
     that: kubectl_process.stdout | length == 0
-    fail_msg: "An existing kubectl is running (PID={{ kubectl_process.stdout }})"
+    fail_msg: "An existing kubectl is running. Do you need to 'kill {{ kubectl_process.stdout }}'?"
