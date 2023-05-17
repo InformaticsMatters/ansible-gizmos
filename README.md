@@ -18,7 +18,7 @@ Some *gizmos* may have additional prerequisites.
 If they do the playbook should assert they are satisfied or make the prerequisite clear.
 
 To get started, use the Poetry shell (environment): -
- 
+
     $ poetry shell
     $ poetry install
 
