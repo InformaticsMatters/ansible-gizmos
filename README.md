@@ -3,6 +3,8 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
+[![lint](https://github.com/InformaticsMatters/ansible-gizmos/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/InformaticsMatters/ansible-gizmos/actions/workflows/lint.yaml)
+
 Generally useful Ansible playbooks (and roles), designed to run on localhost
 (without an inventory), that don't fit in any other project. The outer project is
 managed by Poetry.
