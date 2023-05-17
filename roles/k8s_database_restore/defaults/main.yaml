@@ -16,6 +16,11 @@ kdr_db_pod_port: "5432"
 # See the Ansible postgresql_db module.
 kdr_db_file_compression: ""
 
+# User, if set the role creates it
+# and provides ownership to the restored database.
+kdr_db_user: ""
+kdr_db_user_password: ""
+
 # The local port to forward to the database pod
 kdr_db_local_port: "5432"
 # The local directory where you want the restore to be read from.

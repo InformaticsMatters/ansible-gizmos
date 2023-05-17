@@ -10,6 +10,13 @@
     - kdr_db_database | string | length > 0
     - kdr_db_local_port | string | length > 0
 
+- name: Check user password
+  assert:
+    that:
+    - kdr_db_user_password | length > 0
+    fail_msg: "kdr_db_user_password is not set"
+  when: kdr_db_user | length > 0
+
 - name: Set restore file
   set_fact:
     restore_file: "{{ kdr_db_restore_directory }}/{{ kdr_db_file_basename }}.sql{{ kdr_db_file_compression }}"
@@ -67,6 +74,26 @@
   community.postgresql.postgresql_db:
     name: "{{ kdr_db_database }}"
     login_host: "127.0.0.1"
+
+- name: Create User
+  block:
+  
+  - name: Create user {{ kdr_db_user }}
+    community.postgresql.postgresql_user:
+      name: "{{ kdr_db_user }}"
+      password: "{{ kdr_db_user_password }}"
+      login_host: "127.0.0.1"
+
+  - name: Grant user ALL privileges to {{ kdr_db_database }}
+    community.postgresql.postgresql_privs:
+      db: postgres
+      privs: ALL
+      type: database
+      obj: "{{ kdr_db_database }}"
+      role: "{{ kdr_db_user }}"
+      login_host: "127.0.0.1"
+
+  when: kdr_db_user | length > 0
 
 - name: Restoring database ({{ kdr_db_database }}) <- {{ restore_file }}
   community.postgresql.postgresql_db:
