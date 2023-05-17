@@ -42,7 +42,12 @@ jobs:
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --no-root
+    - name: Pre-commit check
+      run: |
+        source .venv/bin/activate
+        pre-commit run --all-files
     - name: Lint
       run: |
+        source .venv/bin/activate
         ansible-lint
         yamllint
