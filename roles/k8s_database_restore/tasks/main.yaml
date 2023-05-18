@@ -132,6 +132,7 @@
     tasks_from: kill.yaml
   vars:
     ktl_pid: "{{ k8s_kubectl_pid }}"
+  when: not ansible_check_mode
 
 # Report success or failure
 

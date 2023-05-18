@@ -54,9 +54,17 @@
 - name: Set success (assume failure)
   ansible.builtin.set_fact:
     success: no
+  when: not ansible_check_mode
+
+- name: Set success (assume success)
+  ansible.builtin.set_fact:
+    success: yes
+  when: ansible_check_mode
 
 - name: Known database
-  when: database_discovered
+  when:
+  - database_discovered
+  - not ansible_check_mode
   block:
 
   # Get and display key information about the database
@@ -111,6 +119,7 @@
     tasks_from: kill.yaml
   vars:
     ktl_pid: "{{ k8s_kubectl_pid }}"
+  when: not ansible_check_mode
 
 # Copy the dump file to S3?
 
@@ -120,7 +129,9 @@
     s3_bucket: "{{ kdd_db_s3_bucket }}"
     s3_bucket_directory: "{{ kdd_db_s3_bucket_directory }}"
     s3_src: "{{ dump_file }}"
-  when: kdd_db_s3_bucket | string | length > 0
+  when:
+  - kdd_db_s3_bucket | string | length > 0
+  - not ansible_check_mode
 
 # Report success or failure
 
