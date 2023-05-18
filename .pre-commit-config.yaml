@@ -45,3 +45,8 @@ repos:
     additional_dependencies:
     - ansible==7.5.0
     - ansible-core>=2.14.5
+
+- repo: https://github.com/IamTheFij/ansible-pre-commit
+  rev: v1.0.0
+  hooks:
+  - id: encryption-check
