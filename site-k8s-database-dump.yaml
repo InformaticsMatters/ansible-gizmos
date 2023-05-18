@@ -1,7 +1,8 @@
 ---
 
 # Dump a database using kubectl to port-forward to a database Pod
-# hosted on a cluster. Requires a suitable 'kubectl' utility.
+# hosted on a cluster, optionally copying to an S3 bucket.
+# Requires a suitable 'kubectl' utility.
 
 - hosts: localhost
   roles:
