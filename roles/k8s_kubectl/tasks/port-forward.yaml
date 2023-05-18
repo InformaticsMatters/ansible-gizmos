@@ -30,6 +30,7 @@
   assert:
     that: kubectl_process.stdout_lines[0] | int == 0
     fail_msg: I cannot continue safely, a kubectl process is already running
+  when: not ansible_check_mode
 
 # Set the command to run kubectl port-forward
 
