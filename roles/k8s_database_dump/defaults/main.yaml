@@ -16,6 +16,14 @@ kdd_db_pod_port: "5432"
 # See the Ansible postgresql_db module.
 kdd_db_file_compression: ""
 
+# An optional dump file prefix pattern, essentially a Python 'strftime' pattern.
+# If set the result is pre-pended to the db_file_basename
+# and can be used to create a crude filename rotation mechanism.
+# For example a prefix_pattern of "%A-%H-" will append the day of the week
+# and current hour to the dump filename, e.g. "Monday-12-backup.sql".
+# See https://strftime.org/ for more information.
+kdd_db_file_basename_prefix_pattern: ""
+
 # Dump's 'extra-args' parameter,
 # See the Ansible postgresql_db module.
 kdd_db_dump_extra_args: "--clean"

@@ -107,6 +107,14 @@
       role: "{{ kdr_db_user }}"
       login_host: "127.0.0.1"
 
+  - name: Set {{ kdr_db_database }} owner to {{ kdr_db_user }}
+    community.postgresql.postgresql_owner:
+      db: postgres
+      obj_name: "{{ kdr_db_database }}"
+      obj_type: database
+      new_owner: "{{ kdr_db_user }}"
+      login_host: "127.0.0.1"
+
   when: kdr_db_user | length > 0
 
 - name: Restoring database ({{ kdr_db_database }}) <- {{ restore_file }}

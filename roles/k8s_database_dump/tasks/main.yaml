@@ -47,7 +47,9 @@
 
 - name: Set dump file
   set_fact:
-    dump_file: "{{ kdd_db_dump_directory }}/{{ kdd_db_file_basename }}.sql{{ kdd_db_file_compression }}"
+    dump_file: "{{ kdd_db_dump_directory }}/\
+      {{ kdd_db_file_basename_prefix_pattern | strftime }}\
+      {{ kdd_db_file_basename }}.sql{{ kdd_db_file_compression }}"
 
 - name: Set success (assume failure)
   set_fact:
@@ -55,6 +57,26 @@
 
 - name: Known database
   block:
+
+  # Get and display key information about the database
+
+  - name: Collect database info
+    community.postgresql.postgresql_info:
+      db: "{{ kdd_db_database }}"
+      login_host: "127.0.0.1"
+    register: postgresql_info
+
+  - name: Display database version
+    debug:
+      var: postgresql_info.version.full
+
+  - name: Display database owner
+    debug:
+      var: postgresql_info.databases.{{ kdd_db_database }}.owner
+
+  - name: Display database size
+    debug:
+      var: postgresql_info.databases.{{ kdd_db_database }}.size
 
   # Dump the known chosen database
 
