@@ -7,7 +7,7 @@
 # - k8s_kubectl_cmd - the command that was run
 
 - name: Check variables
-  assert:
+  ansible.builtin.assert:
     that:
     - ktl_kubeconfig is defined
     - ktl_namespace is defined
@@ -16,68 +16,69 @@
     - ktl_pod_port is defined
     - ktl_port_forward_time_seconds is defined
 
-- include_tasks: _check-kubeconfig.yaml
-- include_tasks: _check-kubectl.yaml
+- name: Check kubeconfig
+  ansible.builtin.include_tasks: _check-kubeconfig.yaml
+- name: Check kubectl
+  ansible.builtin.include_tasks: _check-kubectl.yaml
 
 # Do not do anything if a kubectl process is already running
 
 - name: Check for kubectl process
-  shell: ps -ef | grep kubectl | grep -v grep | wc -l
+  ansible.builtin.shell: ps -ef | grep kubectl | grep -v grep | wc -l
   changed_when: no
-  register: kubectl_process
+  register: k8s_kubectl_kubectl_process
 
 - name: Stop if there's a kubectl process
-  assert:
-    that: kubectl_process.stdout_lines[0] | int == 0
+  ansible.builtin.assert:
+    that: k8s_kubectl_kubectl_process.stdout_lines[0] | int == 0
     fail_msg: I cannot continue safely, a kubectl process is already running
   when: not ansible_check_mode
 
 # Set the command to run kubectl port-forward
 
 - name: Set command
-  set_fact:
-    cmd: >-
+  ansible.builtin.set_fact:
+    k8s_kubectl_cmd: >-
       kubectl port-forward
       --kubeconfig={{ ktl_kubeconfig | expanduser }}
       -n {{ ktl_namespace }}
       {{ ktl_pod }} {{ ktl_local_port }}:{{ ktl_pod_port }}
 
 - name: Display command
-  debug:
-    msg: "{{ cmd }}"
+  ansible.builtin.debug:
+    msg: "{{ k8s_kubectl_cmd }}"
 
 # Use kubectl to port-forward to the database pod.
 # We also get the process ID so we can kill it when we're done.
 
 - name: Run kubectl port-forward
-  command: "{{ cmd }}"
+  ansible.builtin.command: "{{ k8s_kubectl_cmd }}"
   async: "{{ ansible_check_mode | ternary(0, ktl_port_forward_time_seconds) }}"
   poll: 0
   changed_when: no
-  register: port_forward
 
 - name: Get kubectl PID
-  shell: >
+  ansible.builtin.shell: >
     set -o pipefail && \
-    ps -ef | grep '{{ cmd }}' | grep -v grep | awk '{print $2}'
+    ps -ef | grep '{{ k8s_kubectl_cmd }}' | grep -v grep | awk '{print $2}'
   changed_when: no
-  register: kubectl_process
+  register: k8s_kubectl_kubectl_process
 
 - name: Display kubectl PID
-  debug:
-    msg: kubectl pid={{ kubectl_process.stdout }}
+  ansible.builtin.debug:
+    msg: kubectl pid={{ k8s_kubectl_kubectl_process.stdout }}
 
 - name: Ensure that kubectl PID is a whole positive number
-  assert:
-    that: kubectl_process.stdout is regex("^[0-9]+$")
+  ansible.builtin.assert:
+    that: k8s_kubectl_kubectl_process.stdout is regex("^[0-9]+$")
     fail_msg: kubectl PID is not a number
   when: not ansible_check_mode
 
 - name: Give kubectl a few seconds to get ready
-  pause:
+  ansible.builtin.pause:
     seconds: 2
 
 - name: Set return variables
-  set_fact:
-    k8s_kubectl_pid: "{{ kubectl_process.stdout }}"
-    k8s_kubectl_cmd: "{{ cmd }}"
+  ansible.builtin.set_fact:
+    k8s_kubectl_pid: "{{ k8s_kubectl_kubectl_process.stdout }}"
+    k8s_kubectl_cmd: "{{ k8s_kubectl_cmd }}"

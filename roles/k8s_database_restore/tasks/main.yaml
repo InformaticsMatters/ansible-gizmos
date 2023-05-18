@@ -3,7 +3,7 @@
 # Check initial conditions
 
 - name: Check variables
-  assert:
+  ansible.builtin.assert:
     that:
     - kdr_db_kubeconfig | string | length > 0
     - kdr_db_namespace | string | length > 0
@@ -11,7 +11,7 @@
     - kdr_db_local_port | string | length > 0
 
 - name: Check user password
-  assert:
+  ansible.builtin.assert:
     that:
     - kdr_db_user_password | length > 0
     fail_msg: "kdr_db_user_password is not set"
@@ -20,11 +20,11 @@
 # Check the restore file (download form S3 if required)
 
 - name: Set restore file
-  set_fact:
+  ansible.builtin.set_fact:
     restore_file: "{{ kdr_db_restore_directory }}/{{ kdr_db_file_basename }}.sql{{ kdr_db_file_compression }}"
 
 - name: Get from S3
-  include_tasks: from-s3.yaml
+  ansible.builtin.include_tasks: from-s3.yaml
   vars:
     s3_bucket: "{{ kdr_db_s3_bucket }}"
     s3_bucket_directory: "{{ kdr_db_s3_bucket_directory }}"
@@ -32,19 +32,19 @@
   when: kdr_db_s3_bucket | string | length > 0
 
 - name: Stat the restore file
-  stat:
+  ansible.builtin.stat:
     path: "{{ restore_file }}"
   register: restore_file_stat
 
 - name: Assert the restore file exists
-  assert:
+  ansible.builtin.assert:
     that:
     - restore_file_stat.stat.exists
     fail_msg: "The restore file '{{ restore_file }}' does not exist"
   when: not ansible_check_mode
 
 - name: Display restore destination
-  debug:
+  ansible.builtin.debug:
     msg:
     - Restoring database '{{ kdr_db_database }}' from '{{ restore_file }}'
     - Size {{ ansible_check_mode | ternary(0, restore_file_stat.stat.size) }} bytes
@@ -53,7 +53,7 @@
     - And Pod '{{ kdr_db_pod }}'
 
 - name: A cautionary reminder before we restore
-  pause:
+  ansible.builtin.pause:
     prompt: >
       Are you sure you want to restore from this file?
       Type 'YES' to continue
@@ -61,7 +61,7 @@
   when: not ansible_check_mode
 
 - name: Assert confirmation
-  assert:
+  ansible.builtin.assert:
     that: pause_result.user_input == 'YES'
     fail_msg: "Stopping - you did not type YES"
   when: not ansible_check_mode
@@ -70,7 +70,7 @@
 # We also get the process ID so we can use that to kill it when we're done.
 
 - name: Run kubectl port-forward
-  include_role:
+  ansible.builtin.include_role:
     name: k8s_kubectl
     tasks_from: port-forward.yaml
   vars:
@@ -90,6 +90,7 @@
   when: not ansible_check_mode
 
 - name: Create User
+  when: kdr_db_user | length > 0
   block:
 
   - name: Create user {{ kdr_db_user }}
@@ -107,7 +108,7 @@
       role: "{{ kdr_db_user }}"
       login_host: "127.0.0.1"
 
-  - name: Set {{ kdr_db_database }} owner to {{ kdr_db_user }}
+  - name: Set database owner to {{ kdr_db_user }}
     community.postgresql.postgresql_owner:
       db: postgres
       obj_name: "{{ kdr_db_database }}"
@@ -115,9 +116,7 @@
       new_owner: "{{ kdr_db_user }}"
       login_host: "127.0.0.1"
 
-  when: kdr_db_user | length > 0
-
-- name: Restoring database ({{ kdr_db_database }}) <- {{ restore_file }}
+- name: Restoring database from {{ restore_file }}
   community.postgresql.postgresql_db:
     name: "{{ kdr_db_database }}"
     state: restore
@@ -128,7 +127,7 @@
 # Always kill the async command
 
 - name: Kill kubectl command
-  include_role:
+  ansible.builtin.include_role:
     name: k8s_kubectl
     tasks_from: kill.yaml
   vars:
@@ -137,7 +136,7 @@
 # Report success or failure
 
 - name: Display summary
-  debug:
+  ansible.builtin.debug:
     msg:
     - The '{{ kdr_db_database }}' database has been restored
     - Using kubeconfig '{{ kdr_db_kubeconfig }}'

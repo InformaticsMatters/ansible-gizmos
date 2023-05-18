@@ -7,13 +7,13 @@
 # (see https://docs.ansible.com/ansible/latest/collections/amazon/aws/s3_object_module.html)
 
 - name: Check variables
-  assert:
+  ansible.builtin.assert:
     that:
     - s3_bucket | string | length > 0
     - s3_src | string | length > 0
 
 - name: Check bucket path
-  assert:
+  ansible.builtin.assert:
     that:
     - not s3_bucket_directory | regex_search('^/')
     - not s3_bucket_directory | regex_search('/$')
@@ -21,6 +21,7 @@
   when: s3_bucket_directory | string | length > 0
 
 - name: Act with S3
+  when: not ansible_check_mode
   block:
 
   # We create the bucket, then the path and then put the file
@@ -49,5 +50,3 @@
       object: "{{ s3_bucket_directory }}/{{ s3_src | basename }}"
       src: "{{ s3_src }}"
       mode: put
-
-  when: not ansible_check_mode

@@ -25,8 +25,23 @@ repos:
   - id: check-docstring-first
   - id: check-executables-have-shebangs
   - id: check-shebang-scripts-are-executable
+  - id: check-toml
+  - id: check-yaml
   - id: detect-private-key
   - id: end-of-file-fixer
   - id: trailing-whitespace
     args:
     - --markdown-linebreak-ext=md
+
+- repo: https://github.com/adrienverge/yamllint
+  rev: v1.31.0
+  hooks:
+  - id: yamllint
+
+- repo: https://github.com/ansible-community/ansible-lint
+  rev: v6.16.1
+  hooks:
+  - id: ansible-lint
+    additional_dependencies:
+    - ansible==7.5.0
+    - ansible-core>=2.14.5

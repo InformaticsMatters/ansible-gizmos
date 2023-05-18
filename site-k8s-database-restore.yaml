@@ -4,6 +4,7 @@
 # hosted on a cluster, optionally sourcing the file from an S3 bucket.
 # Requires a suitable 'kubectl' utility.
 
-- hosts: localhost
+- name: Restore database to a Kubernetes server
+  hosts: localhost
   roles:
   - k8s_database_restore

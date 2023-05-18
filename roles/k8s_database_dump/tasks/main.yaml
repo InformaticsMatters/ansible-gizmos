@@ -3,7 +3,7 @@
 # Check initial conditions
 
 - name: Check variables
-  assert:
+  ansible.builtin.assert:
     that:
     - kdd_db_kubeconfig | string | length > 0
     - kdd_db_namespace | string | length > 0
@@ -14,7 +14,7 @@
 # We also get the process ID so we can use that to kill it when we're done.
 
 - name: Run kubectl port-forward
-  include_role:
+  ansible.builtin.include_role:
     name: k8s_kubectl
     tasks_from: port-forward.yaml
   vars:
@@ -36,26 +36,27 @@
   when: not ansible_check_mode
 
 - name: Set database discovered (check mode)
-  set_fact:
+  ansible.builtin.set_fact:
     database_discovered: yes
   when: ansible_check_mode
 
 - name: Set database discovered (check mode)
-  set_fact:
+  ansible.builtin.set_fact:
     database_discovered: "{{ kdd_db_database in postgresql_info.databases }}"
   when: not ansible_check_mode
 
 - name: Set dump file
-  set_fact:
+  ansible.builtin.set_fact:
     dump_file: "{{ kdd_db_dump_directory }}/\
       {{ kdd_db_file_basename_prefix_pattern | strftime }}\
       {{ kdd_db_file_basename }}.sql{{ kdd_db_file_compression }}"
 
 - name: Set success (assume failure)
-  set_fact:
+  ansible.builtin.set_fact:
     success: no
 
 - name: Known database
+  when: database_discovered
   block:
 
   # Get and display key information about the database
@@ -67,20 +68,20 @@
     register: postgresql_info
 
   - name: Display database version
-    debug:
+    ansible.builtin.debug:
       var: postgresql_info.version.full
 
   - name: Display database owner
-    debug:
+    ansible.builtin.debug:
       var: postgresql_info.databases.{{ kdd_db_database }}.owner
 
   - name: Display database size
-    debug:
+    ansible.builtin.debug:
       var: postgresql_info.databases.{{ kdd_db_database }}.size
 
   # Dump the known chosen database
 
-  - name: Dumping database ({{ kdd_db_database }}) -> {{ dump_file }}
+  - name: Dumping database to {{ dump_file }}
     community.postgresql.postgresql_db:
       name: "{{ kdd_db_database }}"
       state: dump
@@ -89,26 +90,23 @@
       dump_extra_args: "{{ kdd_db_dump_extra_args }}"
 
   - name: Set success
-    set_fact:
+    ansible.builtin.set_fact:
       success: yes
 
-  when: database_discovered
-
 - name: Unknown database
+  when: not database_discovered
   block:
 
   # Database does not exist - tell the user
 
   - name: Unknown database
-    debug:
+    ansible.builtin.debug:
       msg: "Unknown database '{{ kdd_db_database }}'"
-
-  when: not database_discovered
 
 # Always kill the async command
 
 - name: Kill kubectl command
-  include_role:
+  ansible.builtin.include_role:
     name: k8s_kubectl
     tasks_from: kill.yaml
   vars:
@@ -117,7 +115,7 @@
 # Copy the dump file to S3?
 
 - name: Copy to S3
-  include_tasks: to-s3.yaml
+  ansible.builtin.include_tasks: to-s3.yaml
   vars:
     s3_bucket: "{{ kdd_db_s3_bucket }}"
     s3_bucket_directory: "{{ kdd_db_s3_bucket_directory }}"
@@ -127,17 +125,17 @@
 # Report success or failure
 
 - name: Assert success
-  assert:
+  ansible.builtin.assert:
     that: success
     fail_msg: "Dump of the '{{ kdd_db_database }}' database failed"
 
 - name: Stat the written file
-  stat:
+  ansible.builtin.stat:
     path: "{{ dump_file }}"
   register: dump_file_stat
 
 - name: Display summary
-  debug:
+  ansible.builtin.debug:
     msg:
     - The '{{ kdd_db_database }}' database has been dumped to '{{ dump_file }}'
     - Size {{ ansible_check_mode | ternary(0, dump_file_stat.stat.size) }} bytes

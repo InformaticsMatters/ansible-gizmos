@@ -1,5 +1,6 @@
 ---
 warn_list:
 - risky-shell-pipe
+- var-naming[no-role-prefix]
 skip_list:
 - yaml

@@ -4,6 +4,7 @@
 # hosted on a cluster, optionally copying to an S3 bucket.
 # Requires a suitable 'kubectl' utility.
 
-- hosts: localhost
+- name: Dump database from a Kubernetes server
+  hosts: localhost
   roles:
   - k8s_database_dump

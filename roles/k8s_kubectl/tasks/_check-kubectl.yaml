@@ -3,7 +3,7 @@
 # (Optionally) Install kubectl
 
 - name: Install kubectl
-  include_role:
+  ansible.builtin.include_role:
     name: githubixx.kubectl
   vars:
     kubectl_owner: "{{ ansible_effective_user_id }}"
@@ -18,21 +18,21 @@
 # Makes sure the 'kubectl' command exists
 
 - name: Find kubectl
-  command: which kubectl
+  ansible.builtin.command: which kubectl
   changed_when: no
-  register: kubectl_check
+  register: k8s_kubectl_kubectl_check
 
 - name: Assert kubectl is installed
-  fail:
+  ansible.builtin.fail:
     msg: "kubectl cannot be found"
-  when: kubectl_check.rc != 0
+  when: k8s_kubectl_kubectl_check.rc != 0
 
 - name: Get existing kubectl process
-  shell: ps -ef | grep kubectl | grep -v grep | awk '{print $2}'
+  ansible.builtin.shell: ps -ef | grep kubectl | grep -v grep | awk '{print $2}'
   changed_when: no
-  register: kubectl_process
+  register: k8s_kubectl_kubectl_process
 
 - name: Assert no existing kubectl process
-  assert:
-    that: kubectl_process.stdout | length == 0
-    fail_msg: "An existing kubectl is running. Do you need to 'kill {{ kubectl_process.stdout }}'?"
+  ansible.builtin.assert:
+    that: k8s_kubectl_kubectl_process.stdout | length == 0
+    fail_msg: "An existing kubectl is running. Do you need to 'kill {{ k8s_kubectl_kubectl_process.stdout }}'?"
