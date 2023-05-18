@@ -12,7 +12,8 @@
     - s3_bucket | string | length > 0
     - s3_src | string | length > 0
 
-- assert:
+- name: Check bucket path
+  assert:
     that:
     - not s3_bucket_directory | regex_search('^/')
     - not s3_bucket_directory | regex_search('/$')
