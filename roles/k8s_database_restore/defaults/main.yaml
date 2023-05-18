@@ -32,3 +32,7 @@ kdr_db_restore_directory: /tmp
 # The timeout is simply a protection mechanism.
 # Set it to something much higher than you expect the process to take.
 kdr_db_port_forward_time_minutes: 60
+
+# Copy file from S3?
+kdr_db_s3_bucket: ""
+kdr_db_s3_bucket_directory: ""

@@ -17,9 +17,19 @@
     fail_msg: "kdr_db_user_password is not set"
   when: kdr_db_user | length > 0
 
+# Check the restore file (download form S3 if required)
+
 - name: Set restore file
   set_fact:
     restore_file: "{{ kdr_db_restore_directory }}/{{ kdr_db_file_basename }}.sql{{ kdr_db_file_compression }}"
+
+- name: Get from S3
+  include_tasks: from-s3.yaml
+  vars:
+    s3_bucket: "{{ kdr_db_s3_bucket }}"
+    s3_bucket_directory: "{{ kdr_db_s3_bucket_directory }}"
+    s3_dest: "{{ restore_file }}"
+  when: kdr_db_s3_bucket | string | length > 0
 
 - name: Stat the restore file
   stat:

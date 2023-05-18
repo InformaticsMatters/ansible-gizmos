@@ -1,6 +1,6 @@
 ---
 
-# Put a file on an S3 bucket.
+# Get a file from an S3 bucket.
 #
 # We check some control variables but the user is expected to have
 # defined suitable environment variables to allow the AWS S3 module to work
@@ -10,7 +10,7 @@
   assert:
     that:
     - s3_bucket | string | length > 0
-    - s3_src | string | length > 0
+    - s3_dest | string | length > 0
 
 - name: Check bucket path
   assert:
@@ -20,10 +20,10 @@
     fail_msg: "s3_bucket_directory must be a relative path without leading or trailing slashes"
   when: s3_bucket_directory | string | length > 0
 
-- name: Put on S3
+- name: Get the file from S3
   amazon.aws.s3_object:
     bucket: "{{ s3_bucket }}"
-    object: "{{ s3_bucket_directory }}/{{ s3_src | basename }}"
-    src: "{{ s3_src }}"
-    mode: put
+    object: "{{ s3_bucket_directory }}/{{ s3_dest | basename }}"
+    dest: "{{ s3_dest }}"
+    mode: get
   when: not ansible_check_mode
