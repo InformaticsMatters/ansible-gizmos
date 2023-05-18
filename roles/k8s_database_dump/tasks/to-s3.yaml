@@ -20,10 +20,34 @@
     fail_msg: "s3_bucket_directory must be a relative path without leading or trailing slashes"
   when: s3_bucket_directory | string | length > 0
 
-- name: Put on S3
-  amazon.aws.s3_object:
-    bucket: "{{ s3_bucket }}"
-    object: "{{ s3_bucket_directory }}/{{ s3_src | basename }}"
-    src: "{{ s3_src }}"
-    mode: put
+- name: Act with S3
+  block:
+
+  # We create the bucket, then the path and then put the file
+  # in separate stages because the STFC Echo service (S3 compatible)
+  # does not like automatically creating buckets and paths.
+  # AWS lets's us do all this in one task, but we are forced to use 3.
+  #
+  # AWS and Echo are chosen by the user by setting the environment variables
+  # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_URL and AWS_DEFAULT_REGION.
+  #
+  # The AWS_DEFAULT_REGION is not set for the STFC/Echo service.
+
+  - name: Create the bucket
+    amazon.aws.s3_bucket:
+      name: "{{ s3_bucket }}"
+
+  - name: Create the bucket path
+    amazon.aws.s3_object:
+      bucket: "{{ s3_bucket }}"
+      object: "{{ s3_bucket_directory }}"
+      mode: create
+
+  - name: Put the file
+    amazon.aws.s3_object:
+      bucket: "{{ s3_bucket }}"
+      object: "{{ s3_bucket_directory }}/{{ s3_src | basename }}"
+      src: "{{ s3_src }}"
+      mode: put
+
   when: not ansible_check_mode
