@@ -14,7 +14,7 @@
   when:
   - not ansible_check_mode
   - ktl_install_kubectl | bool
-  
+
 # Makes sure the 'kubectl' command exists
 
 - name: Find kubectl
