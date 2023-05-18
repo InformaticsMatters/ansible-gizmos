@@ -28,11 +28,23 @@ To get started, use the Poetry shell (environment): -
     poetry shell
     poetry install
 
-And from here you can run a playbook: -
+Some **gizmos** depend on Ansible galaxy roles. These can be installed in the normal way
+using our `requirements.yaml` file: -
+
+    ansible-galaxy install -r requirements.yaml
+
+>   **CAUTION** Some playbooks can install command-line tools that may replace
+    tools you already have. They do not do this automatically, you can install these
+    tools yourself. If you want the gizmo to install the tool you have to set
+    a suitable variable for these potentially destructive actions. One example is
+    `kubectl`, which will be installed in `/usr/local/bin` if you set `ktl_install_kubectl`
+    (see our `k8s_kubectl` role regarding this tool).
+
+Once you're setup you can run a **gizmo*: -
 
     ansible-playbook site-k8s-database-dump.yaml
 
-And use a `parameters.yaml` file if you need to,
+And use a `parameters.yaml` file if you need to control the playbook's behaviour,
 which is protected from git with our `.gitignore` file: -
 
     ansible-playbook site-k8s-database-dump.yaml -e @parameters.yaml

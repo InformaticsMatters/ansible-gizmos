@@ -1,0 +1,4 @@
+---
+# kubectl
+- src: githubixx.kubectl
+  version: 22.0.0+1.27.1

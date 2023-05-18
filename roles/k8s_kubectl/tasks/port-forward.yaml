@@ -9,14 +9,27 @@
 - name: Check variables
   assert:
     that:
-    - kc_kubeconfig is defined
-    - kc_pod is defined
-    - kc_local_port is defined
-    - kc_pod_port is defined
-    - kc_port_forward_time_seconds is defined
+    - ktl_kubeconfig is defined
+    - ktl_namespace is defined
+    - ktl_pod is defined
+    - ktl_local_port is defined
+    - ktl_pod_port is defined
+    - ktl_port_forward_time_seconds is defined
 
 - include_tasks: _check-kubeconfig.yaml
 - include_tasks: _check-kubectl.yaml
+
+# Do not do anything if a kubectl process is already running
+
+- name: Check for kubectl process
+  shell: ps -ef | grep kubectl | grep -v grep | wc -l
+  changed_when: no
+  register: kubectl_process
+
+- name: Stop if there's a kubectl process
+  assert:
+    that: kubectl_process.stdout_lines[0] | int == 0
+    fail_msg: I cannot continue safely, a kubectl process is already running
 
 # Set the command to run kubectl port-forward
 
@@ -24,9 +37,9 @@
   set_fact:
     cmd: >-
       kubectl port-forward
-      --kubeconfig={{ kc_kubeconfig | expanduser }}
-      -n {{ kc_namespace }}
-      {{ kc_pod }} {{ kc_local_port }}:{{ kc_pod_port }}
+      --kubeconfig={{ ktl_kubeconfig | expanduser }}
+      -n {{ ktl_namespace }}
+      {{ ktl_pod }} {{ ktl_local_port }}:{{ ktl_pod_port }}
 
 - name: Display command
   debug:
@@ -37,7 +50,7 @@
 
 - name: Run kubectl port-forward
   command: "{{ cmd }}"
-  async: "{{ ansible_check_mode | ternary(0, kc_port_forward_time_seconds) }}"
+  async: "{{ ansible_check_mode | ternary(0, ktl_port_forward_time_seconds) }}"
   poll: 0
   changed_when: no
   register: port_forward

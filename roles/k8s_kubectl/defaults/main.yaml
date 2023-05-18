@@ -1,0 +1,6 @@
+---
+
+# Install kubectl?
+# And, if so, the version to install
+ktl_install_kubectl: no
+ktl_kubectl_version: "1.25.9"

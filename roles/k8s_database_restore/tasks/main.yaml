@@ -64,12 +64,12 @@
     name: k8s_kubectl
     tasks_from: port-forward.yaml
   vars:
-    kc_kubeconfig: "{{ kdr_db_kubeconfig }}"
-    kc_namespace: "{{ kdr_db_namespace }}"
-    kc_pod: "{{ kdr_db_pod }}"
-    kc_local_port: "{{ kdr_db_local_port }}"
-    kc_pod_port: "{{ kdr_db_pod_port }}"
-    kc_port_forward_time_seconds: "{{ kdr_db_port_forward_time_minutes | int * 60 }}"
+    ktl_kubeconfig: "{{ kdr_db_kubeconfig }}"
+    ktl_namespace: "{{ kdr_db_namespace }}"
+    ktl_pod: "{{ kdr_db_pod }}"
+    ktl_local_port: "{{ kdr_db_local_port }}"
+    ktl_pod_port: "{{ kdr_db_pod_port }}"
+    ktl_port_forward_time_seconds: "{{ kdr_db_port_forward_time_minutes | int * 60 }}"
 
 # Restore the database
 
@@ -114,7 +114,7 @@
     name: k8s_kubectl
     tasks_from: kill.yaml
   vars:
-    kc_pid: "{{ k8s_kubectl_pid }}"
+    ktl_pid: "{{ k8s_kubectl_pid }}"
 
 # Report success or failure
 
