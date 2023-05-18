@@ -28,8 +28,8 @@ To get started, use the Poetry shell (environment): -
     poetry shell
     poetry install
 
-Some **gizmos** depend on Ansible galaxy roles. These can be installed in the normal way
-using our `requirements.yaml` file: -
+Some **gizmos** depend on [Ansible Galaxy] roles and collection.
+These can be installed in the normal way using our `requirements.yaml` file: -
 
     ansible-galaxy install -r requirements.yaml
 
@@ -71,7 +71,8 @@ current health of your clone with: -
 
 ---
 
+[ansible galaxy]: https://galaxy.ansible.com/
 [commitizen]: https://commitizen-tools.github.io/commitizen/
 [conventional commit]: https://www.conventionalcommits.org/en/v1.0.0/
-[pre-commit]: https://pre-commit.com
+[pre-commit]: https://pre-commit.com/
 [poetry]: https://python-poetry.org/

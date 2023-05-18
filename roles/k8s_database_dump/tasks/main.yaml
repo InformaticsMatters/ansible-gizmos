@@ -92,6 +92,16 @@
   vars:
     ktl_pid: "{{ k8s_kubectl_pid }}"
 
+# Copy the dump file to S3?
+
+- name: Copy to S3
+  include_tasks: to-s3.yaml
+  vars:
+    s3_bucket: "{{ kdd_db_s3_bucket }}"
+    s3_bucket_directory: "{{ kdd_db_s3_bucket_directory }}"
+    s3_src: "{{ dump_file }}"
+  when: kdd_db_s3_bucket | string | length > 0
+
 # Report success or failure
 
 - name: Assert success

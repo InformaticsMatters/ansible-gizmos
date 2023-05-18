@@ -1,4 +1,11 @@
 ---
-# kubectl
+
+# Ansible Galaxy roles and collections that we depend on
+
+roles:
 - src: githubixx.kubectl
-  version: 22.0.0+1.27.1
+  version: '22.0.0+1.27.1'
+
+collections:
+- name: amazon.aws
+  version: '6.0.0'

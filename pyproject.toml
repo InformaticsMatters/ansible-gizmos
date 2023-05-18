@@ -10,6 +10,9 @@ python = "3.10.*"
 ansible = "7.5.0"
 psycopg2 = "2.9.6"
 kubernetes = "26.1.0"
+# For the Ansible AWS collection...
+boto3 = ">= 1.18.0"
+botocore = ">= 1.21.0"
 
 [tool.poetry.group.dev.dependencies]
 ansible-lint = "5.*"

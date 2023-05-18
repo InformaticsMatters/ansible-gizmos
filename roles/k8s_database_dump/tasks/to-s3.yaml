@@ -1,0 +1,27 @@
+---
+
+# Put a file on an S3 bucket.
+#
+# We check some control variables but the user is expected to have
+# defined suitable environment variables to allow the AWS S3 module to work
+# (see https://docs.ansible.com/ansible/latest/collections/amazon/aws/s3_object_module.html)
+
+- name: Check variables
+  assert:
+    that:
+    - s3_bucket | string | length > 0
+    - s3_src | string | length > 0
+
+- assert:
+    that:
+    - not s3_bucket_directory | regex_search('^/')
+    - not s3_bucket_directory | regex_search('/$')
+    fail_msg: "s3_bucket_directory must be a relative path without leading or trailing slashes"
+  when: s3_bucket_directory | string | length > 0
+
+- name: Put the file on S3 ({{ s3_bucket }}/{{ s3_bucket_directory }})
+  amazon.aws.s3_object:
+    bucket: "{{ s3_bucket }}"
+    object: "{{ s3_bucket_directory }}/{{ s3_src | basename }}"
+    src: "{{ s3_src }}"
+    mode: put
