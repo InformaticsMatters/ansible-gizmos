@@ -20,14 +20,13 @@
 
 - name: Wait for kubectl to stop
   ansible.builtin.wait_for:
-    path: /proc/{{ item }}/status
+    path: /proc/{{ ktl_pid }}/status
     state: absent
-  with_items: "{{ kubectl_process.stdout_lines }}"
   ignore_errors: true
   register: k8s_kubectl_killed_processes
 
 - name: Force kill stuck kubectl
   ansible.builtin.command: kill -9 {{ item }}
-  register: k8s_kubectl_kill_output
   changed_when: k8s_kubectl_kill_output.rc != 0
   with_items: "{{ k8s_kubectl_killed_processes.results | select('failed') | map(attribute='item') | list }}"
+  when: k8s_kubectl_killed_processes.results is defined
