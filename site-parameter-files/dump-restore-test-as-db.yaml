@@ -1,0 +1,26 @@
+---
+
+# Parameters used with the site-k8s-database-dump.yaml
+# and site-k8s-database-restore.yaml playbooks (repository v1.0.0).
+# Used 19th May 2023 to restore the AS DB while moving from PG 11.10 to PG 13.9.
+#
+# ansible-playbook site-k8s-database-dump.yaml -e @site-parameter-files/dump-restore-test-as-db.yaml
+# ansible-playbook site-k8s-database-restore.yaml -e @site-parameter-files/dump-restore-test-as-db.yaml
+#
+# Alan Christie
+# 22nd May 2021
+
+kdd_db_namespace: account-server-api-test
+kdd_db_database: accountserver
+kdd_db_file_basename: backup-test-as
+kdd_db_file_basename_prefix_pattern: "%A-%H-"
+kdd_db_kubeconfig: ~/k8s-config/config-xchem-development-admin
+kdd_db_s3_bucket: im-gizmo
+kdd_db_s3_bucket_directory: gizmo-database-dumps/account-server-api-test
+
+kdr_db_namespace: account-server-api-test
+kdr_db_database: accountserver
+kdr_db_file_basename: Thursday-15-backup-test-as
+kdr_db_kubeconfig: ~/k8s-config/config-xchem-development-admin
+kdr_db_s3_bucket: im-gizmo
+kdr_db_s3_bucket_directory: gizmo-database-dumps/account-server-api-test

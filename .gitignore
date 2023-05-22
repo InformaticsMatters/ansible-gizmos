@@ -1,4 +1,3 @@
 venv/
 parameters.*.yaml
 .vscode/
-site-parameter-files/
