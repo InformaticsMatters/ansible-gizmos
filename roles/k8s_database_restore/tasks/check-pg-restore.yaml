@@ -20,7 +20,7 @@
 - name: Assert pg_restore is installed
   ansible.builtin.fail:
     msg: pg_restore cannot be found. You must install a compatible pg_restore
-  when: pg_restore.rc != 0
+  when: pg_restore_check.rc != 0
 
 - name: Collect pg_restore info
   ansible.builtin.command: pg_restore --version

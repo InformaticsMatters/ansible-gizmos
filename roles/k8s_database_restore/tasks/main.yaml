@@ -112,6 +112,7 @@
   ansible.builtin.assert:
     that: kdr_db_error_message is not defined
     fail_msg: An error message exists '{{ kdr_db_error_message }}'
+  when: kdr_db_error_message is defined
 
 - name: Display summary
   ansible.builtin.debug:
