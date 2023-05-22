@@ -24,7 +24,7 @@
 
 - name: Assert kubectl is installed
   ansible.builtin.fail:
-    msg: "kubectl cannot be found"
+    msg: kubectl cannot be found
   when: k8s_kubectl_kubectl_check.rc != 0
 
 - name: Get existing kubectl process

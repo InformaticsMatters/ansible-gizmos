@@ -87,48 +87,14 @@
     ktl_pod_port: "{{ kdr_db_pod_port }}"
     ktl_port_forward_time_seconds: "{{ kdr_db_port_forward_time_minutes | int * 60 }}"
 
-# Restore the database
+- name: Check pg_restore
+  ansible.builtin.include_tasks: check-pg-restore.yaml
 
-- name: Create database ({{ kdr_db_database }})
-  community.postgresql.postgresql_db:
-    name: "{{ kdr_db_database }}"
-    login_host: "127.0.0.1"
-  when: not ansible_check_mode
-
-- name: Create User
-  when: kdr_db_user | length > 0
-  block:
-
-  - name: Create user {{ kdr_db_user }}
-    community.postgresql.postgresql_user:
-      name: "{{ kdr_db_user }}"
-      password: "{{ kdr_db_user_password }}"
-      login_host: "127.0.0.1"
-
-  - name: Grant user ALL privileges to {{ kdr_db_database }}
-    community.postgresql.postgresql_privs:
-      db: postgres
-      privs: ALL
-      type: database
-      obj: "{{ kdr_db_database }}"
-      role: "{{ kdr_db_user }}"
-      login_host: "127.0.0.1"
-
-  - name: Set database owner to {{ kdr_db_user }}
-    community.postgresql.postgresql_owner:
-      db: postgres
-      obj_name: "{{ kdr_db_database }}"
-      obj_type: database
-      new_owner: "{{ kdr_db_user }}"
-      login_host: "127.0.0.1"
-
-- name: Restoring database from {{ restore_file }}
-  community.postgresql.postgresql_db:
-    name: "{{ kdr_db_database }}"
-    state: restore
-    target: "{{ restore_file }}"
-    login_host: "127.0.0.1"
-  when: not ansible_check_mode
+- name: Restore database
+  ansible.builtin.include_tasks: restore-database.yaml
+  when:
+  - kdr_restore_version_ok is defined
+  - kdr_restore_version_ok
 
 # Always kill the async command
 
@@ -141,6 +107,11 @@
   when: not ansible_check_mode
 
 # Report success or failure
+
+- name: Assert success
+  ansible.builtin.assert:
+    that: kdr_db_error_message is not defined
+    fail_msg: An error message exists '{{ kdr_db_error_message }}'
 
 - name: Display summary
   ansible.builtin.debug:

@@ -6,11 +6,24 @@
 #
 # Outputs: -
 #
-# - 'k8s_database_dump_version_ok' is set to 'yes'
-#   if the version is suitable for the chosen database.
+# - 'kdd_dump_version_ok' is set to 'yes'
+#       if the version is suitable for the chosen database.
+# - 'kdd_db_error_message' is set to an error message
+#       if the version is not suitable.
+
+- name: Find pg_dump
+  ansible.builtin.command: which pg_dump
+  changed_when: no
+  ignore_errors: yes
+  register: pg_dump_check
+
+- name: Assert pg_dump is installed
+  ansible.builtin.fail:
+    msg: pg_dump cannot be found. You must install a compatible pg_dump
+  when: pg_dump_check.rc != 0
 
 - name: Collect pg_dump info
-  ansible.builtin.command: "pg_dump --version"
+  ansible.builtin.command: pg_dump --version
   changed_when: false
   register: pg_dump_info
 
@@ -44,7 +57,7 @@
 
     - name: Set success
       ansible.builtin.set_fact:
-        k8s_database_dump_version_ok: yes
+        kdd_dump_version_ok: yes
 
   - name: Check failure
     when: pg_dump_version is ansible.builtin.version(postgresql_info.version.full, '<')
@@ -52,7 +65,7 @@
 
     - name: Set failure
       ansible.builtin.set_fact:
-        k8s_database_dump_version_ok: no
+        kdd_dump_version_ok: no
 
     - name: Set error message
       ansible.builtin.set_fact:

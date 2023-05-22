@@ -38,8 +38,8 @@
 - name: Dump database
   ansible.builtin.include_tasks: dump-database.yaml
   when:
-  - k8s_database_dump_version_ok is defined
-  - k8s_database_dump_version_ok
+  - kdd_dump_version_ok is defined
+  - kdd_dump_version_ok
 
 # Always kill the async command
 
@@ -62,7 +62,7 @@
   when:
   - kdd_db_s3_bucket | string | length > 0
   - not ansible_check_mode
-  - k8s_database_dump_version_ok
+  - kdd_dump_version_ok
 
 # Report success or failure
 
