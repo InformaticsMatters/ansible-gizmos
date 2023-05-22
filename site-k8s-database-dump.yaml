@@ -3,6 +3,8 @@
 # Dump a database using kubectl to port-forward to a database Pod
 # hosted on a cluster, optionally copying to an S3 bucket.
 # Requires a suitable 'kubectl' utility.
+#
+# By default the database is dumped using the extra args "--clean".
 
 - name: Dump database from a Kubernetes server
   hosts: localhost

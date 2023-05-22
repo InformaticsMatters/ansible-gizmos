@@ -42,6 +42,8 @@ repos:
   rev: v6.16.1
   hooks:
   - id: ansible-lint
+    args:
+    - --nocolor
     additional_dependencies:
     - ansible==7.5.0
     - ansible-core>=2.14.5

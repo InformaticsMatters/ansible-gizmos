@@ -49,6 +49,11 @@ which is protected from git with our `.gitignore` file: -
 
     ansible-playbook site-k8s-database-dump.yaml -e @parameters.yaml
 
+>   Parameter files that you want to preserve should be put int the `site-parameter-files`
+    directory, which is monitored by git. If there are sensitive values in the files,
+    remember to encrypt the file with [Ansible Vault], and **ALWAYS** use the
+    extension `.vault`.
+
 ## Contributing
 The project uses: -
 
@@ -72,6 +77,7 @@ current health of your clone with: -
 ---
 
 [ansible galaxy]: https://galaxy.ansible.com/
+[ansible vault]: https://docs.ansible.com/ansible/latest/vault_guide/index.html
 [commitizen]: https://commitizen-tools.github.io/commitizen/
 [conventional commit]: https://www.conventionalcommits.org/en/v1.0.0/
 [pre-commit]: https://pre-commit.com/

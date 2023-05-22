@@ -1,0 +1,87 @@
+---
+# Does the chosen database exist?
+
+- name: Collect databases
+  community.postgresql.postgresql_info:
+    filter:
+    - databases
+    login_host: "127.0.0.1"
+  register: postgresql_info
+  when: not ansible_check_mode
+
+- name: Set database discovered (check mode)
+  ansible.builtin.set_fact:
+    database_discovered: yes
+  when: ansible_check_mode
+
+- name: Set database discovered (check mode)
+  ansible.builtin.set_fact:
+    database_discovered: "{{ kdd_db_database in postgresql_info.databases }}"
+  when: not ansible_check_mode
+
+- name: Set dump file
+  ansible.builtin.set_fact:
+    dump_file: "{{ kdd_db_dump_directory }}/\
+      {{ kdd_db_file_basename_prefix_pattern | strftime }}\
+      {{ kdd_db_file_basename }}.sql{{ kdd_db_file_compression }}"
+
+- name: Set success (assume failure)
+  ansible.builtin.set_fact:
+    success: no
+  when: not ansible_check_mode
+
+- name: Set success (assume success)
+  ansible.builtin.set_fact:
+    kdd_dump_success: yes
+  when: ansible_check_mode
+
+- name: Known database
+  when:
+  - database_discovered
+  - not ansible_check_mode
+  block:
+
+  # Get and display key information about the database
+
+  - name: Collect database info
+    community.postgresql.postgresql_info:
+      db: "{{ kdd_db_database }}"
+      login_host: "127.0.0.1"
+    register: postgresql_info
+
+  - name: Display database owner
+    ansible.builtin.debug:
+      var: postgresql_info.databases.{{ kdd_db_database }}.owner
+
+  - name: Display database size
+    ansible.builtin.debug:
+      var: postgresql_info.databases.{{ kdd_db_database }}.size
+
+  # Dump the known chosen database
+
+  - name: Dumping database to {{ dump_file }}
+    community.postgresql.postgresql_db:
+      name: "{{ kdd_db_database }}"
+      state: dump
+      target: "{{ dump_file }}"
+      login_host: "127.0.0.1"
+      dump_extra_args: "{{ kdd_db_dump_extra_args }}"
+    register: k8s_database_dump_dump_result
+
+  - name: Display dump result
+    ansible.builtin.debug:
+      var: k8s_database_dump_dump_result
+
+  - name: Set success
+    ansible.builtin.set_fact:
+      kdd_dump_success: yes
+
+- name: Unknown database
+  when: not database_discovered
+  block:
+
+  # Database does not exist - tell the user
+
+  - name: Unknown database
+    ansible.builtin.debug:
+      msg: "Unknown database '{{ kdd_db_database }}'"

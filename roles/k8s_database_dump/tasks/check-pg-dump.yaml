@@ -1,0 +1,65 @@
+---
+
+# Collect pg_dump version information
+# It's output is typically "pg_dump (PostgreSQL) 13.9 (Debian 13.9-0+deb11u1)"
+# so we have to parse it. Since PostgreSQL 10 all version numbers are 2 digits.
+#
+# Outputs: -
+#
+# - 'k8s_database_dump_version_ok' is set to 'yes'
+#   if the version is suitable for the chosen database.
+
+- name: Collect pg_dump info
+  ansible.builtin.command: "pg_dump --version"
+  changed_when: false
+  register: pg_dump_info
+
+- name: Set pg_dump version
+  ansible.builtin.set_fact:
+    pg_dump_version: "{{ pg_dump_info.stdout \
+      | regex_replace('pg_dump \\(PostgreSQL\\) ([0-9]+\\.[0-9]+).*', '\\1') }}"
+
+- name: Display pg_dump version
+  ansible.builtin.debug:
+    var: pg_dump_version
+
+  # Ensure pg_dump is at least the same version as the database server
+
+- name: Check
+  when: not ansible_check_mode
+  block:
+
+  - name: Collect database info
+    community.postgresql.postgresql_info:
+      login_host: "127.0.0.1"
+    register: postgresql_info
+
+  - name: Display database version
+    ansible.builtin.debug:
+      var: postgresql_info.version.full
+
+  - name: Check failure
+    when: pg_dump_version is ansible.builtin.version(postgresql_info.version.full, '>=')
+    block:
+
+    - name: Set success
+      ansible.builtin.set_fact:
+        k8s_database_dump_version_ok: yes
+
+  - name: Check failure
+    when: pg_dump_version is ansible.builtin.version(postgresql_info.version.full, '<')
+    block:
+
+    - name: Set failure
+      ansible.builtin.set_fact:
+        k8s_database_dump_version_ok: no
+
+    - name: Set error message
+      ansible.builtin.set_fact:
+        kdd_db_error_message: >-
+          pg_dump ({{ pg_dump_version }}) is not compatible
+          with ({{ postgresql_info.version.full }})
+
+    - name: Display failure
+      ansible.builtin.debug:
+        var: kdd_db_error_message
