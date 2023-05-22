@@ -52,6 +52,12 @@
     - To Namespace '{{ kdr_db_namespace }}'
     - And Pod '{{ kdr_db_pod }}'
 
+- name: Display restore user
+  ansible.builtin.debug:
+    msg:
+    - With user '{{ kdr_db_user }}' ownership and password '{{ kdr_db_user_password }}'
+  when: kdr_db_user | length > 0
+
 - name: A cautionary reminder before we restore
   ansible.builtin.pause:
     prompt: >
