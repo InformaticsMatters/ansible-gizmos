@@ -28,7 +28,7 @@ To get started, use the Poetry shell (environment): -
     poetry shell
     poetry install
 
-Some **gizmos** depend on [Ansible Galaxy] roles and collection.
+Some **gizmos** depend on [Ansible Galaxy] roles and collections.
 These can be installed in the normal way using our `requirements.yaml` file: -
 
     ansible-galaxy install -r requirements.yaml
