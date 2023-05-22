@@ -24,7 +24,9 @@
 # Do not do anything if a kubectl process is already running
 
 - name: Check for kubectl process
-  ansible.builtin.shell: ps -ef | grep kubectl | grep -v grep | wc -l
+  ansible.builtin.shell: set -o pipefail && ps -ef | grep kubectl | grep -v grep | wc -l
+  args:
+    executable: /bin/bash
   changed_when: no
   register: k8s_kubectl_kubectl_process
 
