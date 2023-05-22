@@ -40,7 +40,7 @@ These can be installed in the normal way using our `requirements.yaml` file: -
     `kubectl`, which will be installed in `/usr/local/bin` if you set `ktl_install_kubectl`
     (see our `k8s_kubectl` role regarding this tool).
 
-Once you're setup you can run a **gizmo*: -
+Once you're setup you can run a **gizmo**: -
 
     ansible-playbook site-k8s-database-dump.yaml
 
@@ -57,7 +57,7 @@ which is protected from git with our `.gitignore` file: -
 ## Contributing
 The project uses: -
 
-- [pre-commit] to enforce linting of files prior to committing them to the
+- [Pre-commit] to enforce linting of files prior to committing them to the
   upstream repository
 - [Commitizen] to enforce a [Conventional Commit] commit message format
 
