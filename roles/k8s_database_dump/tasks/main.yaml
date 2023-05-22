@@ -37,7 +37,9 @@
 
 - name: Dump database
   ansible.builtin.include_tasks: dump-database.yaml
-  when: k8s_database_dump_version_ok
+  when:
+  - k8s_database_dump_version_ok is defined
+  - k8s_database_dump_version_ok
 
 # Always kill the async command
 
@@ -72,14 +74,17 @@
     fail_msg: >-
       Dump of the '{{ kdd_db_database }}' database failed.
       Error is '{{ kdd_db_error_message }}'
+  when: not ansible_check_mode
 
 - name: Stat the written file
   ansible.builtin.stat:
     path: "{{ dump_file }}"
   register: dump_file_stat
+  when: not ansible_check_mode
 
 - name: Display summary
   ansible.builtin.debug:
     msg:
     - The '{{ kdd_db_database }}' database has been dumped to '{{ dump_file }}'
     - Size {{ ansible_check_mode | ternary(0, dump_file_stat.stat.size) }} bytes
+  when: not ansible_check_mode
