@@ -6,7 +6,7 @@ authors = ["Alan Christie <achristie@informaticsmatters.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.10.*"
+python = "3.11.*"
 ansible = "7.5.0"
 psycopg2 = "2.9.6"
 kubernetes = "26.1.0"
