@@ -5,8 +5,8 @@
 # Used 19th May 2023 to move the DM DB from the data-manager-api-production Namespace
 # to the account-server-api-production Namespace while also moving from PG 11.10 to PG 13.9.
 #
-# ansible-playbook site-k8s-database-dump.yaml -e @site-parameter-files/move-prod-dm-db.yaml --ask-vault-pass
-# ansible-playbook site-k8s-database-restore.yaml -e @site-parameter-files/move-prod-dm-db.yaml --ask-vault-pass
+# ansible-playbook site-k8s-database-dump.yaml -e @site-parameter-files/move-prod-dm-db.yaml
+# ansible-playbook site-k8s-database-restore.yaml -e @site-parameter-files/move-prod-dm-db.yaml
 #
 # Alan Christie
 # 22nd May 2021
