@@ -45,6 +45,7 @@
   - name: Collect database info
     community.postgresql.postgresql_info:
       login_host: "127.0.0.1"
+      login_user: "{{ kdr_db_admin_user }}"
     register: postgresql_info
 
   - name: Display database version

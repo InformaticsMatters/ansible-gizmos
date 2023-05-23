@@ -27,6 +27,9 @@ kdr_db_local_port: "5432"
 # The file uses the database name with a .sql.gz extension.
 kdr_db_restore_directory: /tmp
 
+# The DB admin user
+kdr_db_admin_user: postgres
+
 # Maximum length of time to allow an asynchronous kubectl to run.
 # kubectl is run asynchronously and then killed by playbooks and roles.
 # The timeout is simply a protection mechanism.

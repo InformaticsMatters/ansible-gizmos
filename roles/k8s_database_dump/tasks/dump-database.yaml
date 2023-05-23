@@ -6,6 +6,7 @@
     filter:
     - databases
     login_host: "127.0.0.1"
+    login_user: "{{ kdd_db_admin_user }}"
   register: postgresql_info
   when: not ansible_check_mode
 
@@ -47,6 +48,7 @@
     community.postgresql.postgresql_info:
       db: "{{ kdd_db_database }}"
       login_host: "127.0.0.1"
+      login_user: "{{ kdd_db_admin_user }}"
     register: postgresql_info
 
   - name: Display database owner
@@ -65,6 +67,7 @@
       state: dump
       target: "{{ dump_file }}"
       login_host: "127.0.0.1"
+      login_user: "{{ kdd_db_admin_user }}"
       dump_extra_args: "{{ kdd_db_dump_extra_args }}"
     register: k8s_database_dump_dump_result
 
