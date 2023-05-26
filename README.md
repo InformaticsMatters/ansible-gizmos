@@ -4,6 +4,7 @@
 
 [![lint](https://github.com/InformaticsMatters/ansible-gizmos/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/InformaticsMatters/ansible-gizmos/actions/workflows/lint.yaml)
 
+[![CodeFactor](https://www.codefactor.io/repository/github/informaticsmatters/ansible-gizmos/badge)](https://www.codefactor.io/repository/github/informaticsmatters/ansible-gizmos)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Packaged with Poetry](https://img.shields.io/badge/packaging-poetry-cyan.svg)](https://python-poetry.org/)
