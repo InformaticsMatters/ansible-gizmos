@@ -1,7 +1,7 @@
 ---
 
 # Parameters used with the site-k8s-database-dump.yaml
-# and site-k8s-database-restore.yaml playbooks (repository v1.0.0).
+# and site-k8s-database-restore.yaml playbooks (repository v1.1.2).
 # Used 19th May 2023 to restore the AS DB while moving from PG 11.10 to PG 13.9.
 #
 # ansible-playbook site-k8s-database-dump.yaml -e @site-parameter-files/dump-restore-test-as-db.yaml

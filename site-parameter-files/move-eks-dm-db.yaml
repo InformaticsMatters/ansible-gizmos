@@ -1,7 +1,7 @@
 ---
 
 # Parameters used with the site-k8s-database-dump.yaml
-# and site-k8s-database-restore.yaml playbooks (repository v1.0.0).
+# and site-k8s-database-restore.yaml playbooks (repository v1.1.2).
 #
 # ansible-playbook site-k8s-database-dump.yaml -e @site-parameter-files/move-eks-dm-db.yaml
 # ansible-playbook site-k8s-database-restore.yaml -e @site-parameter-files/move-eks-dm-db.yaml
@@ -16,7 +16,7 @@ kdd_db_kubeconfig: ~/k8s-config/config-aws-im-main-eks
 kdd_db_s3_bucket: im-gizmo
 kdd_db_s3_bucket_directory: gizmo-database-dumps/data-manager-eks-prod
 
-# Note - Password is set vid KDR_DB_USER_PASSWORD environment variable...
+# Note - Password is set via KDR_DB_USER_PASSWORD environment variable...
 
 kdr_db_namespace: account-server-api-production
 kdr_db_database: datatier
