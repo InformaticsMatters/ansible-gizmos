@@ -1,0 +1,36 @@
+---
+
+# Creates the database
+
+- name: Create database ({{ kdc_db_database }})
+  community.postgresql.postgresql_db:
+    name: "{{ kdc_db_database }}"
+    login_host: "127.0.0.1"
+    login_user: "{{ kdc_db_admin_user }}"
+  when: not ansible_check_mode
+
+- name: Create user {{ kdc_db_user }}
+  community.postgresql.postgresql_user:
+    name: "{{ kdc_db_user }}"
+    password: "{{ kdc_db_user_password }}"
+    login_host: "127.0.0.1"
+    login_user: "{{ kdc_db_admin_user }}"
+
+- name: Grant user ALL privileges to {{ kdc_db_database }}
+  community.postgresql.postgresql_privs:
+    db: postgres
+    privs: ALL
+    type: database
+    obj: "{{ kdc_db_database }}"
+    role: "{{ kdc_db_user }}"
+    login_host: "127.0.0.1"
+    login_user: "{{ kdc_db_admin_user }}"
+
+- name: Set database owner to {{ kdc_db_user }}
+  community.postgresql.postgresql_owner:
+    db: postgres
+    obj_name: "{{ kdc_db_database }}"
+    obj_type: database
+    new_owner: "{{ kdc_db_user }}"
+    login_host: "127.0.0.1"
+    login_user: "{{ kdc_db_admin_user }}"

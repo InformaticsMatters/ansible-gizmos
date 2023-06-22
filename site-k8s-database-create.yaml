@@ -1,0 +1,10 @@
+---
+
+# Create a database using kubectl to port-forward to a database Pod
+# hosted on a cluster.
+# Requires a suitable 'kubectl' utility.
+
+- name: Create a database
+  hosts: localhost
+  roles:
+  - k8s_database_create
