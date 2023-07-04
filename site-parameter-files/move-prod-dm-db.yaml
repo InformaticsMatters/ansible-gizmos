@@ -9,7 +9,7 @@
 # ansible-playbook site-k8s-database-restore.yaml -e @site-parameter-files/move-prod-dm-db.yaml
 #
 # Alan Christie
-# 22nd May 2021
+# 22nd May 2023
 
 kdd_db_namespace: data-manager-api-production
 kdd_db_database: datatier

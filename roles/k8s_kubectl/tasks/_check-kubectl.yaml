@@ -38,4 +38,4 @@
 - name: Assert no existing kubectl process
   ansible.builtin.assert:
     that: k8s_kubectl_kubectl_process.stdout | length == 0
-    fail_msg: "An existing kubectl is running. Do you need to 'kill {{ k8s_kubectl_kubectl_process.stdout }}'?"
+    fail_msg: "An existing kubectl or lens-like app is running. Do you need to 'kill {{ k8s_kubectl_kubectl_process.stdout }}'?"
