@@ -23,6 +23,7 @@ kdd_db_s3_bucket_directory: gizmo-database-dumps/data-manager-dls-dev
 kdr_db_namespace: account-server-api-dev
 kdr_db_database: datatier
 kdr_db_user: datatier
+kdr_db_user_attr_flags: SUPERUSER
 kdr_db_file_basename: Friday-15-backup
 kdr_db_kubeconfig: ~/k8s-config/config-xchem-development-admin
 kdr_db_s3_bucket: im-gizmo

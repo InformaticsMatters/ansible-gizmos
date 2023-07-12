@@ -21,6 +21,7 @@ kdd_db_s3_bucket_directory: gizmo-database-dumps/data-manager-eks-prod
 kdr_db_namespace: account-server-api-production
 kdr_db_database: datatier
 kdr_db_user: datatier
+kdr_db_user_attr_flags: SUPERUSER
 kdr_db_file_basename: Tuesday-07-backup
 kdr_db_kubeconfig: ~/k8s-config/config-aws-im-main-eks
 kdr_db_s3_bucket: im-gizmo

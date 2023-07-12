@@ -17,6 +17,7 @@
     community.postgresql.postgresql_user:
       name: "{{ kdr_db_user }}"
       password: "{{ kdr_db_user_password }}"
+      role_attr_flags: "{{ kdr_db_user_attr_flags }}"
       login_host: "127.0.0.1"
       login_user: "{{ kdr_db_admin_user }}"
 

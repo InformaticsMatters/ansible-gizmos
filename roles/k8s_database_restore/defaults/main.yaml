@@ -20,6 +20,8 @@ kdr_db_file_compression: ""
 # and provides ownership to the restored database.
 kdr_db_user: ""
 kdr_db_user_password: "{{ lookup('env', 'KDR_DB_USER_PASSWORD') }}"
+# Role attributes, like "SUPERUSER"?
+kdr_db_user_attr_flags: ""
 
 # The local port to forward to the database pod
 kdr_db_local_port: "5432"
