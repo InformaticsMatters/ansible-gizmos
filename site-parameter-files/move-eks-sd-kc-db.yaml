@@ -1,0 +1,27 @@
+---
+
+# Parameters used with the site-k8s-database-dump.yaml
+# and site-k8s-database-restore.yaml playbooks (repository v1.1.3).
+#
+# ansible-playbook site-k8s-database-dump.yaml -e @site-parameter-files/move-eks-sd-kc-db.yaml
+# ansible-playbook site-k8s-database-restore.yaml -e @site-parameter-files/move-eks-sd-kc-db.yaml
+#
+# Alan Christie
+# 4th Jul 2023
+
+kdd_db_namespace: syg-infra
+kdd_db_database: keycloak
+kdd_db_file_basename_prefix_pattern: "%A-%H-"
+kdd_db_kubeconfig: ~/k8s-config/config-aws-im-main-eks
+kdd_db_s3_bucket: im-gizmo
+kdd_db_s3_bucket_directory: gizmo-database-dumps/keycloak-eks-syg
+
+# Note - Password is set via KDR_DB_USER_PASSWORD environment variable...
+
+kdr_db_namespace: sd-infra
+kdr_db_database: keycloak
+kdr_db_user: keycloak
+kdr_db_file_basename: Tuesday-07-backup
+kdr_db_kubeconfig: ~/k8s-config/config-aws-im-main-eks
+kdr_db_s3_bucket: im-gizmo
+kdr_db_s3_bucket_directory: gizmo-database-dumps/keycloak-eks-syg
