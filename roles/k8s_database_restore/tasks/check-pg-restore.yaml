@@ -46,6 +46,7 @@
     community.postgresql.postgresql_info:
       login_host: "127.0.0.1"
       login_user: "{{ kdr_db_admin_user }}"
+      login_password: "{{ kdr_db_admin_password }}"
     register: postgresql_info
 
   - name: Display database version

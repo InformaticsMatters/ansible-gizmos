@@ -4,7 +4,7 @@
 #
 # Returns: -
 # - k8s_kubectl_pid - the the process ID
-# - k8s_kubectl_cmd - the command that was run
+# - k8s_kubectl_options - the kubectl command options that were run
 
 - name: Check variables
   ansible.builtin.assert:
@@ -41,21 +41,21 @@
 
 - name: Set command
   ansible.builtin.set_fact:
-    k8s_kubectl_cmd: >-
-      kubectl port-forward
+    k8s_kubectl_options: >-
+      port-forward
       --kubeconfig={{ ktl_kubeconfig | expanduser }}
       -n {{ ktl_namespace }}
       {{ ktl_pod }} {{ ktl_local_port }}:{{ ktl_pod_port }}
 
 - name: Display command
   ansible.builtin.debug:
-    msg: "{{ k8s_kubectl_cmd }}"
+    msg: kubectl {{ k8s_kubectl_options }}
 
 # Use kubectl to port-forward to the database pod.
 # We also get the process ID so we can kill it when we're done.
 
 - name: Run kubectl port-forward
-  ansible.builtin.command: "{{ k8s_kubectl_cmd }}"
+  ansible.builtin.command: kubectl {{ k8s_kubectl_options }}
   async: "{{ ansible_check_mode | ternary(0, ktl_port_forward_time_seconds) }}"
   poll: 0
   changed_when: no
@@ -63,7 +63,7 @@
 - name: Get kubectl PID
   ansible.builtin.shell: >
     set -o pipefail && \
-    ps -ef | grep '{{ k8s_kubectl_cmd }}' | grep -v grep | awk '{print $2}'
+    ps -ef | grep '{{ k8s_kubectl_options }}' | grep -v grep | awk '{print $2}'
   changed_when: no
   register: k8s_kubectl_kubectl_process
 
@@ -84,4 +84,4 @@
 - name: Set return variables
   ansible.builtin.set_fact:
     k8s_kubectl_pid: "{{ k8s_kubectl_kubectl_process.stdout }}"
-    k8s_kubectl_cmd: "{{ k8s_kubectl_cmd }}"
+    k8s_kubectl_options: "{{ k8s_kubectl_options }}"

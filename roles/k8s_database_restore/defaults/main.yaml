@@ -31,6 +31,7 @@ kdr_db_restore_directory: /tmp
 
 # The DB admin user
 kdr_db_admin_user: postgres
+kdr_db_admin_password: ""
 
 # Maximum length of time to allow an asynchronous kubectl to run.
 # kubectl is run asynchronously and then killed by playbooks and roles.

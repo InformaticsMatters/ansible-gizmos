@@ -7,6 +7,7 @@
     name: "{{ kdr_db_database }}"
     login_host: "127.0.0.1"
     login_user: "{{ kdr_db_admin_user }}"
+    login_password: "{{ kdr_db_admin_password }}"
   when: not ansible_check_mode
 
 - name: Create User
@@ -20,6 +21,7 @@
       role_attr_flags: "{{ kdr_db_user_attr_flags }}"
       login_host: "127.0.0.1"
       login_user: "{{ kdr_db_admin_user }}"
+      login_password: "{{ kdr_db_admin_password }}"
 
   - name: Grant user ALL privileges to {{ kdr_db_database }}
     community.postgresql.postgresql_privs:
@@ -30,6 +32,7 @@
       role: "{{ kdr_db_user }}"
       login_host: "127.0.0.1"
       login_user: "{{ kdr_db_admin_user }}"
+      login_password: "{{ kdr_db_admin_password }}"
 
   - name: Set database owner to {{ kdr_db_user }}
     community.postgresql.postgresql_owner:
@@ -39,6 +42,7 @@
       new_owner: "{{ kdr_db_user }}"
       login_host: "127.0.0.1"
       login_user: "{{ kdr_db_admin_user }}"
+      login_password: "{{ kdr_db_admin_password }}"
 
 - name: Restoring database from {{ restore_file }}
   community.postgresql.postgresql_db:
@@ -47,4 +51,5 @@
     target: "{{ restore_file }}"
     login_host: "127.0.0.1"
     login_user: "{{ kdr_db_admin_user }}"
+    login_password: "{{ kdr_db_admin_password }}"
   when: not ansible_check_mode
