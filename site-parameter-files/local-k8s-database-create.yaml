@@ -1,0 +1,5 @@
+---
+kdc_db_namespace: im-account-server
+kdc_db_database: datatier
+kdc_db_user: datatier
+kdc_db_user_password: blob1234

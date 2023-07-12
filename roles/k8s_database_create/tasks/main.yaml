@@ -1,0 +1,62 @@
+---
+
+# Check initial conditions
+
+- name: Check variables
+  ansible.builtin.assert:
+    that:
+    - kdc_db_kubeconfig | string | length > 0
+    - kdc_db_namespace | string | length > 0
+    - kdc_db_database | string | length > 0
+    - kdc_db_local_port | string | length > 0
+
+- name: Check user password
+  ansible.builtin.assert:
+    that:
+    - kdc_db_user_password | length > 0
+    fail_msg: "kdc_db_user_password is not set. Set it or KDC_DB_USER_PASSWORD"
+  when: kdc_db_user | length > 0
+
+- name: Display user
+  ansible.builtin.debug:
+    msg:
+    - With user '{{ kdc_db_user }}' ownership and password '{{ kdc_db_user_password }}'
+  when: kdc_db_user | length > 0
+
+# Use kubectl to port-forward to the database pod.
+# We also get the process ID so we can use that to kill it when we're done.
+
+- name: Run kubectl port-forward
+  ansible.builtin.include_role:
+    name: k8s_kubectl
+    tasks_from: port-forward.yaml
+  vars:
+    ktl_kubeconfig: "{{ kdc_db_kubeconfig }}"
+    ktl_namespace: "{{ kdc_db_namespace }}"
+    ktl_pod: "{{ kdc_db_pod }}"
+    ktl_local_port: "{{ kdc_db_local_port }}"
+    ktl_pod_port: "{{ kdc_db_pod_port }}"
+    ktl_port_forward_time_seconds: "{{ kdc_db_port_forward_time_minutes | int * 60 }}"
+
+- name: Create database
+  ansible.builtin.include_tasks: create-db.yaml
+
+# Always kill the async command
+
+- name: Kill kubectl command
+  ansible.builtin.include_role:
+    name: k8s_kubectl
+    tasks_from: kill.yaml
+  vars:
+    ktl_pid: "{{ k8s_kubectl_pid }}"
+  when: not ansible_check_mode
+
+# Report success or failure
+
+- name: Display summary
+  ansible.builtin.debug:
+    msg:
+    - The '{{ kdc_db_database }}' database has been created
+    - Using kubeconfig '{{ kdc_db_kubeconfig }}'
+    - In namespace '{{ kdc_db_namespace }}'
+    - And Pod '{{ kdc_db_pod }}'
