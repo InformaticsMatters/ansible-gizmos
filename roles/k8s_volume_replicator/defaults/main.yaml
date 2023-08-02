@@ -13,7 +13,6 @@ kvr_kubeconfig: SetMe
 kvr_namespace: SetMe
 kvr_sa_name: SetMe
 kvr_source_pvc_name: SetMe
-kvr_destination_pvc_name: SetMe
 
 # If the storage class is NFS then kvr_source_nfs_server needs to be set,
 # and the the kvr_source_pvc_name (above) should be the NFS path.
@@ -21,6 +20,9 @@ kvr_destination_pvc_name: SetMe
 kvr_source_pvc_storageclass: ''
 kvr_source_nfs_server: ''
 
+# If you don't specify a specific value
+# the destination is simply the source plus '-kvr'.
+kvr_destination_pvc_name: "{{ kvr_source_pvc_name }}-kvr"
 kvr_destination_pvc_storageclass: longhorn
 
 # If you set the access mode (or size) it will be used.
