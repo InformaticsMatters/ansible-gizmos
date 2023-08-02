@@ -1,0 +1,15 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ kvr_destination_pvc_name }}
+  namespace: {{ kvr_namespace }}
+spec:
+  accessModes:
+  - {{ pvc_access_mode }}
+{% if kvr_destination_pvc_storageclass != ' ' %}
+  storageClassName: {{ kvr_destination_pvc_storageclass }}
+{% endif %}
+  resources:
+    requests:
+      storage: '{{ pvc_size }}'

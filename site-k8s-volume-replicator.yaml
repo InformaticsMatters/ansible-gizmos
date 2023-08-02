@@ -1,0 +1,6 @@
+---
+
+- name: Copy a Kubernetes volume
+  hosts: localhost
+  roles:
+  - k8s_volume_replicator

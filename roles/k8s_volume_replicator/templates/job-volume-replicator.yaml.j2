@@ -1,0 +1,56 @@
+---
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: volume-replicator
+  namespace: {{ kvr_namespace }}
+spec:
+  # Clean-up completed (or failed) Jobs
+  # after 5 minutes...
+  ttlSecondsAfterFinished: 300
+
+  template:
+    metadata:
+      labels:
+        name: volume-replicator
+    spec:
+      serviceAccountName: {{ kvr_sa_name }}
+
+      containers:
+      - name: volume-replicator
+        image: '{{ kvr_replicator_image_registry }}/{{ kvr_replicator_image }}:{{ kvr_replicator_image_tag }}'
+{% if kvr_replicator_image_tag in ['latest', 'stable'] %}
+        imagePullPolicy: Always
+{% else %}
+        imagePullPolicy: IfNotPresent
+{% endif %}
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        - name: REPLICATE_DIRECTION
+          value: 'AtoB'
+        - name: REPLICATE_DELETE
+          value: 'no'
+        volumeMounts:
+        - name: volume-a
+          mountPath: /volume-a
+        - name: volume-b
+          mountPath: /volume-b
+
+      volumes:
+      # Source
+      - name: volume-a
+{% if kvr_source_pvc_storageclass == 'nfs' %}
+        nfs:
+          server: {{ kvr_source_nfs_server }}
+          path: {{ kvr_source_pvc_name }}
+{% else %}
+        persistentVolumeClaim:
+          claimName: {{ kvr_source_pvc_name }}
+{% endif %}
+      # Destination
+      - name: volume-b
+        persistentVolumeClaim:
+          claimName: {{ kvr_destination_pvc_name }}
+
+      restartPolicy: Never
+  backoffLimit: 1

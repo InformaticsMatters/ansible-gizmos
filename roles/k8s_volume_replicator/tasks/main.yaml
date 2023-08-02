@@ -1,0 +1,120 @@
+---
+
+# The user must provide key variables.
+
+- name: Check variables
+  ansible.builtin.assert:
+    that:
+    - kvr_namespace | string | length > 0
+    - kvr_namespace != 'SetMe'
+    - kvr_sa_name | string | length > 0
+    - kvr_sa_name != 'SetMe'
+    - kvr_kubeconfig | string | length > 0
+    - kvr_kubeconfig != 'SetMe'
+    - kvr_destination_pvc_name | string | length > 0
+    - kvr_destination_pvc_name != 'SetMe'
+
+- name: Check NFS source
+  ansible.builtin.assert:
+    that:
+    - kvr_source_nfs_server | string | length > 0
+  when: kvr_source_pvc_storageclass == 'nfs'
+
+# Namespace and the source PVC must exist.
+
+- name: Copy
+  module_defaults:
+    group/k8s:
+      kubeconfig: "{{ kvr_kubeconfig }}"
+      namespace: "{{ kvr_namespace }}"
+  block:
+
+  - name: Get namespace
+    kubernetes.core.k8s_info:
+      api_version: v1
+      kind: Namespace
+      name: "{{ kvr_namespace }}"
+    register: ns_list
+
+  - name: Assert namespace
+    ansible.builtin.assert:
+      that: ns_list.resources | length == 1
+
+  - name: Get source PVC
+    kubernetes.core.k8s_info:
+      api_version: v1
+      kind: PersistentVolumeClaim
+      name: "{{ kvr_source_pvc_name }}"
+    register: pvc_list
+
+  - name: Assert source PVC
+    ansible.builtin.assert:
+      that: pvc_list.resources | length == 1
+
+  # Get the access mode (ReadWirteOnce) and size of the source PVC
+  # and then create the new PVC using these values unless the user has defined their own.
+
+  - name: Get source PVC spec
+    ansible.builtin.set_fact:
+      kvr_source_pvc_access_mode: "{{ pvc_list.resources[0].spec.accessModes[0] }}"
+      kvr_source_pvc_size: "{{ pvc_list.resources[0].spec.resources.requests.storage }}"
+
+  - name: Create destination PVC
+    kubernetes.core.k8s:
+      definition: "{{ lookup('template', 'pvc-destination.yaml.j2') }}"
+      wait: yes
+    vars:
+      pvc_access_mode: "{{ kvr_destination_pvc_access_mode | default(kvr_source_pvc_access_mode, true) }}"
+      pvc_size: "{{ kvr_destination_pvc_size | default(kvr_source_pvc_size, true) }}"
+
+  - name: Remove pre-existing volume replicator Job
+    kubernetes.core.k8s:
+      state: absent
+      definition: "{{ lookup('template', 'job-volume-replicator.yaml.j2') }}"
+      wait: yes
+
+  - name: Get Succeeded volume replicator Pods
+    kubernetes.core.k8s_info:
+      kind: Pod
+      label_selectors:
+      - name=volume-replicator
+      field_selectors:
+      - status.phase=Succeeded
+    register: pods_result
+
+  - name: Delete Succeeded volume replicator Pods
+    kubernetes.core.k8s:
+      kind: Pod
+      name: "{{ item.metadata.name }}"
+      state: absent
+    loop: "{{ pods_result.resources }}"
+    when: pods_result.resources|length > 0
+
+  # Now launch (and wait for) the volume replicator...
+
+  - name: Launch a new volume replicator Job
+    kubernetes.core.k8s:
+      definition: "{{ lookup('template', 'job-volume-replicator.yaml.j2') }}"
+      wait: yes
+
+  - name: Wait for volume replicator Job
+    kubernetes.core.k8s_info:
+      kind: Job
+      name: volume-replicator
+    register: result
+    until: >-
+      result.resources[0].status.completionTime is defined
+      or result.resources[0].status.failed is defined
+    delay: 10
+    retries: "{{ (kvr_job_timeout_minutes | int * 60 / 10) | int }}"
+
+  - name: Display volume replicator Job status
+    ansible.builtin.debug:
+      var: result.resources[0].status
+
+  - name: Assert volume replicator Job success
+    ansible.builtin.assert:
+      that:
+      - result.resources[0].status.succeeded is defined
+      - result.resources[0].status.succeeded == 1
+      - result.resources[0].status.failed is not defined

@@ -1,0 +1,31 @@
+---
+
+# The kubernetes volume replicator 'gizmo'.
+#
+# Given a Namespace, the name of a pre-existing 'source' volume,
+# and the details of a 'destination' volume, this utility creates
+# the destination volume (by default a 'longhorn' volume)
+# and replicates (copies) the data from the source to the destination.
+
+# Some mandatory values...
+
+kvr_kubeconfig: SetMe
+kvr_namespace: SetMe
+kvr_sa_name: SetMe
+kvr_source_pvc_name: SetMe
+kvr_destination_pvc_name: SetMe
+
+# If the storage class is NFS then kvr_source_nfs_server needs to be set,
+# and the the kvr_source_pvc_name (above) should be the NFS path.
+# Otherwise the source storage class is not used.
+kvr_source_pvc_storageclass: ''
+kvr_source_nfs_server: ''
+
+kvr_destination_pvc_storageclass: longhorn
+
+# If you set the access mode (or size) it will be used.
+# If not, the values from the source PVC will be substituted.
+kvr_destination_pvc_access_mode: ''
+kvr_destination_pvc_size: ''
+
+kvr_job_timeout_minutes: 10
