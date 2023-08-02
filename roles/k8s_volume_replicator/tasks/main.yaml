@@ -118,3 +118,28 @@
       - result.resources[0].status.succeeded is defined
       - result.resources[0].status.succeeded == 1
       - result.resources[0].status.failed is not defined
+
+  # Clean up the Job detritus
+
+  - name: Get Succeeded volume replicator Pods
+    kubernetes.core.k8s_info:
+      kind: Pod
+      label_selectors:
+      - name=volume-replicator
+      field_selectors:
+      - status.phase=Succeeded
+    register: pods_result
+
+  - name: Delete Succeeded volume replicator Pods
+    kubernetes.core.k8s:
+      kind: Pod
+      name: "{{ item.metadata.name }}"
+      state: absent
+    loop: "{{ pods_result.resources }}"
+    when: pods_result.resources|length > 0
+
+  - name: Remove volume replicator Job
+    kubernetes.core.k8s:
+      state: absent
+      definition: "{{ lookup('template', 'job-volume-replicator.yaml.j2') }}"
+      wait: yes
