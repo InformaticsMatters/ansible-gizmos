@@ -11,8 +11,10 @@
 
 kvr_kubeconfig: SetMe
 kvr_namespace: SetMe
-kvr_sa_name: SetMe
 kvr_source_pvc_name: SetMe
+
+# Service account name is (by default) the same as the namespace
+kvr_sa_name: "{{ kvr_namespace }}"
 
 # If the storage class is NFS then kvr_source_nfs_server needs to be set,
 # and the the kvr_source_pvc_name (above) should be the NFS path.
@@ -30,4 +32,4 @@ kvr_destination_pvc_storageclass: longhorn
 kvr_destination_pvc_access_mode: ''
 kvr_destination_pvc_size: ''
 
-kvr_job_timeout_minutes: 10
+kvr_job_timeout_minutes: 60
